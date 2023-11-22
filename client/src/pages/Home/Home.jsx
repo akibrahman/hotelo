@@ -1,9 +1,13 @@
+import Categories from "../../components/Categories/Categories";
+import Rooms from "../../components/Rooms/Rooms";
+
 const Home = () => {
   return (
     <div>
-      <h1>Welcome to StayVista</h1>
+      <Categories />
+      <Rooms />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
