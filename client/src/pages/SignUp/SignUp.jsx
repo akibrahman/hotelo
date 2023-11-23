@@ -1,13 +1,25 @@
+import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { ImSpinner9 } from "react-icons/im";
+import { Link, useNavigate } from "react-router-dom";
 import { saveUser } from "../../API/saveUserToDB";
+import { createToken } from "../../API/token";
 import { imageUpload } from "../../API/util";
 import useAuth from "../../hooks/useAuth";
 
 const SignUp = () => {
-  const { createUser, updateUserProfile } = useAuth();
+  const {
+    createUser,
+    updateUserProfile,
+    signInWithGoogle,
+    loading,
+    setLoading,
+  } = useAuth();
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
+    setLoading(true);
     event.preventDefault();
     const form = event.target;
     const name = form.name.value;
@@ -22,12 +34,33 @@ const SignUp = () => {
 
       await updateUserProfile(name, imageData.display_url);
 
-      const saveResult = await saveUser(result?.user);
+      await saveUser(result?.user);
 
-      if (saveResult.acknowledged) {
-        alert("Created");
-      }
+      await createToken(result?.user?.email);
+
+      toast.success("SignUp Successfull");
+
+      navigate("/");
     } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      const result = await signInWithGoogle();
+
+      await saveUser(result?.user);
+
+      await createToken(result?.user?.email);
+
+      toast.success("SignUp Successfull with Google");
+
+      navigate("/");
+    } catch (error) {
+      setLoading(false);
+      toast.error(error.message);
       console.log(error);
     }
   };
@@ -104,9 +137,13 @@ const SignUp = () => {
           <div>
             <button
               type="submit"
-              className="bg-rose-500 w-full rounded-md py-3 text-white"
+              className="bg-rose-500 w-full rounded-md py-3 text-white font-semibold"
             >
-              Continue
+              {loading ? (
+                <ImSpinner9 className="animate-spin m-auto" />
+              ) : (
+                "Sign Up"
+              )}
             </button>
           </div>
         </form>
@@ -117,7 +154,10 @@ const SignUp = () => {
           </p>
           <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
         </div>
-        <div className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer">
+        <div
+          onClick={handleGoogleLogin}
+          className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer"
+        >
           <FcGoogle size={32} />
 
           <p>Continue with Google</p>

@@ -11,6 +11,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
+import { removeToken } from "../API/removeToken";
 import { app } from "../firebase/firebase.config";
 
 export const AuthContext = createContext(null);
@@ -41,8 +42,10 @@ const AuthProvider = ({ children }) => {
     return sendPasswordResetEmail(auth, email);
   };
 
-  const logOut = () => {
+  const logOut = async () => {
     setLoading(true);
+    const Bug = await removeToken();
+    console.log(Bug);
     return signOut(auth);
   };
 
@@ -56,8 +59,12 @@ const AuthProvider = ({ children }) => {
   // onAuthStateChange
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      console.log("CurrentUser-->", currentUser);
+      if (currentUser) {
+        setUser(currentUser);
+        console.log("CurrentUser-->", currentUser);
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
     return () => {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { AiOutlineMenu } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import avatarImg from "../../../assets/images/placeholder.jpg";
@@ -6,7 +7,12 @@ import useAuth from "../../../hooks/useAuth";
 
 const MenuDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
+
+  const handleLogOut = async () => {
+    await logOut();
+    toast.success("Successfully Logged Out");
+  };
 
   return (
     <div className="relative">
@@ -26,12 +32,10 @@ const MenuDropdown = () => {
           <div className="hidden md:block">
             {/* Avatar */}
             <img
-              className="rounded-full"
+              className="rounded-full w-8 h-8"
               referrerPolicy="no-referrer"
               src={user && user.photoURL ? user.photoURL : avatarImg}
               alt="profile"
-              height="30"
-              width="30"
             />
           </div>
         </div>
@@ -46,18 +50,37 @@ const MenuDropdown = () => {
               Home
             </Link>
 
-            <Link
-              to="/login"
-              className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
-            >
-              Sign Up
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                >
+                  Dashboard
+                </Link>
+                <div
+                  onClick={handleLogOut}
+                  className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                >
+                  Log Out
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
