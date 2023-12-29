@@ -1,27 +1,22 @@
-import { formatDistance } from "date-fns";
-import { useState } from "react";
 import Button from "../Button/Button";
 import Calender from "./Calender";
 
-const RoomReservation = ({ room }) => {
+const RoomReservation = ({
+  room,
+  currentValue,
+  reservations,
+  totalPrice,
+  addBookings,
+}) => {
   //!
-  const [value, setValue] = useState({
-    startDate: new Date(room?.from),
-    endDate: new Date(room?.to),
-    key: "selection",
-  });
 
   const handleSelect = (ranges) => {
-    console.log(value);
-    console.log(ranges);
-    setValue({ ...ranges.selection });
+    // console.log(new Date(ranges.selection.startDate));
+    // console.log(ranges);
+    console.log(ranges[Object.keys(ranges)[0]]);
+    // setValue(ranges[Object.keys(ranges)[0]]);
   };
 
-  let totalDays = formatDistance(
-    new Date(value.endDate || room.to),
-    new Date(value.startDate || room.from)
-  );
-  const totalPrice = totalDays.split(" ")[0] * parseFloat(room.price);
   return (
     <div className="rounded-xl border-[1px] border-neutral-200 overflow-hidden bg-white">
       <div className="flex items-center gap-1 p-4">
@@ -30,11 +25,19 @@ const RoomReservation = ({ room }) => {
       </div>
       <hr />
       <div className="flex justify-center">
-        <Calender value={value} handleSelect={handleSelect} />
+        <Calender
+          value={currentValue}
+          handleSelect={handleSelect}
+          reservations={reservations}
+        />
       </div>
       <hr />
-      <div className="">
-        <Button label={"Reserve"} />
+      <div>
+        <Button
+          onClick={addBookings}
+          disabled={totalPrice == 0 ? true : false}
+          label={"Reserve"}
+        />
       </div>
       <hr />
       <div className="p-4 flex items-center justify-between font-semibold text-lg">

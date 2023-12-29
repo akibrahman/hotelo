@@ -5,6 +5,7 @@ import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
 import SignUp from "../pages/SignUp/SignUp";
+import UserPrivateRoute from "./UserPrivateRoute";
 
 export const router = createBrowserRouter([
   {
@@ -18,7 +19,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/room/:id",
-        element: <DetailsPage />,
+        element: (
+          <UserPrivateRoute>
+            <DetailsPage />
+          </UserPrivateRoute>
+        ),
       },
     ],
   },

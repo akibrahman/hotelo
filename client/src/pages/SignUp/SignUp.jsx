@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { ImSpinner9 } from "react-icons/im";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { saveUser } from "../../API/saveUserToDB";
 import { createToken } from "../../API/token";
 import { imageUpload } from "../../API/util";
@@ -17,6 +17,9 @@ const SignUp = () => {
   } = useAuth();
 
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const url = location.state.from.pathname || "/";
 
   const handleSubmit = async (event) => {
     setLoading(true);
@@ -40,7 +43,7 @@ const SignUp = () => {
 
       toast.success("SignUp Successfull");
 
-      navigate("/");
+      navigate(url);
     } catch (error) {
       console.log(error);
     }
@@ -57,7 +60,7 @@ const SignUp = () => {
 
       toast.success("SignUp Successfull with Google");
 
-      navigate("/");
+      navigate(url);
     } catch (error) {
       setLoading(false);
       toast.error(error.message);

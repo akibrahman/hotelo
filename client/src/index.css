@@ -1,3 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+.react-calendar {
+  border-radius: 10px;
+  border: none;
+  width: 500px !important;
+  padding: 20px;
+  max-width: none;
+  margin-bottom: 10px;
+  font-weight: bold;
+  background-color: #f43f5e;
+  color: white;
+}
+.react-calendar__navigation {
+  background-color: #fff;
+  border-radius: 10px;
+  color: #f43f5e;
+}
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  border-radius: 10px;
+}
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #fff;
+  color: #f43f5e;
+  border-radius: 10px;
+}
+.react-calendar__month-view__days__day--weekend {
+  color: #fff;
+}
+.react-date-picker__wrapper {
+  gap: 10px;
+  padding: 5px 20px;
+  border-radius: 5px;
+  /* min-width: 100% !important;
+  width: 100% !important; */
+  /* background: #000; */
+}
+.react-date-picker__inputGroup__year {
+  width: 50px !important;
+  outline: none;
+}
+.react-calendar__tile--active {
+  background: #006edc;
+  color: white;
+  border-radius: 10px;
+  font-weight: bold;
+}

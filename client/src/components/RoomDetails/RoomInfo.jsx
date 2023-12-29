@@ -1,4 +1,17 @@
-const RoomInfo = ({ roomData }) => {
+import DatePicker from "react-date-picker";
+import { FaExclamationCircle } from "react-icons/fa";
+import { LuCalendarMinus, LuCalendarPlus } from "react-icons/lu";
+import Button from "../Button/Button";
+
+const RoomInfo = ({
+  roomData,
+  startDate,
+  selectStartDate,
+  endDate,
+  selectEndDate,
+  currentReserve,
+  error,
+}) => {
   return (
     <div className="col-span-4 flex flex-col gap-8">
       <div className="flex flex-col gap-2">
@@ -46,6 +59,44 @@ const RoomInfo = ({ roomData }) => {
         {roomData.description}
       </div>
       <hr />
+      <div className="flex items-center gap-6">
+        <div className="w-1/2 ">
+          <p>Check In:</p>
+          <DatePicker
+            className={"w-[95%]"}
+            format="dd-MMM-y"
+            onChange={selectStartDate}
+            value={startDate}
+            calendarIcon={<LuCalendarPlus className="text-2xl" />}
+            clearIcon={null}
+            onInvalidChange={() => alert("Invalid")}
+            dayPlaceholder="D"
+            monthPlaceholder="M"
+            yearPlaceholder="Y"
+          />
+        </div>
+        <div className="w-1/2">
+          <p>Check Out:</p>
+          <DatePicker
+            className={"w-[95%]"}
+            format="dd-MMM-y"
+            onChange={selectEndDate}
+            value={endDate}
+            calendarIcon={<LuCalendarMinus className="text-2xl" />}
+            clearIcon={null}
+            dayPlaceholder="D"
+            monthPlaceholder="M"
+            yearPlaceholder="Y"
+          />
+        </div>
+      </div>
+      {error && (
+        <p className="text-red-600 font-bold flex items-center gap-3">
+          <FaExclamationCircle />
+          {error}
+        </p>
+      )}
+      <Button onClick={currentReserve} label={"Check Availability"} />
     </div>
   );
 };

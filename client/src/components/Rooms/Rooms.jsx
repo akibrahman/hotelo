@@ -1,31 +1,20 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import publicAxios from "../../API/publicAxios";
 import Container from "../Shared/Container";
 import Heading from "../Shared/Heading";
 import Loader from "../Shared/Loader";
 import Card from "./Card";
 
 const Rooms = () => {
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [params] = useSearchParams();
-  const category = params.get("category");
-  useEffect(() => {
-    setLoading(true);
-    fetch("./rooms.json")
-      .then((res) => res.json())
-      .then((data) => {
-        if (category) {
-          const filtered = data.filter((room) => room.category == category);
-          setRooms(filtered);
-        } else {
-          setRooms(data);
-        }
-        setLoading(false);
-      });
-  }, [category]);
-
-  if (loading) return <Loader />;
+  const { data: rooms, isLoading } = useQuery({
+    queryKey: ["all-rooms"],
+    queryFn: async () => {
+      const res = await publicAxios.get("/all-rooms");
+      return res.data;
+    },
+  });
+  console.log(rooms);
+  if (isLoading) return <Loader />;
 
   return (
     <Container>
