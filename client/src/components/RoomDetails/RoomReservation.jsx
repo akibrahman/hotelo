@@ -6,7 +6,7 @@ const RoomReservation = ({
   currentValue,
   reservations,
   totalPrice,
-  addBookings,
+  confirmBookings,
 }) => {
   //!
 
@@ -33,11 +33,13 @@ const RoomReservation = ({
       </div>
       <hr />
       <div>
-        <Button
-          onClick={addBookings}
-          disabled={totalPrice == 0 ? true : false}
-          label={"Reserve"}
-        />
+        {totalPrice != 0 && (
+          <Button
+            onClick={confirmBookings}
+            disabled={totalPrice == 0 ? true : false}
+            label={"Reserve"}
+          />
+        )}
       </div>
       <hr />
       <div className="p-4 flex items-center justify-between font-semibold text-lg">

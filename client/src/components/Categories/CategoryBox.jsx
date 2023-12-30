@@ -21,7 +21,7 @@ const CategoryBox = ({ label, icon: Icon, selected }) => {
     <div
       onClick={handleClick}
       className={`flex flex-col items-center justify-center gap-2 p-3 border-b-2 ${
-        selected ? "border-[#F43F5E]" : ""
+        selected ? "border-[#9447D6]" : ""
       } hover:text-neutral-800 transition cursor-pointer`}
     >
       <Icon size={26} />

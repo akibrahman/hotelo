@@ -1,16 +1,22 @@
 const express = require("express");
 const app = express();
+const ssl = require("sslcommerz-lts");
 require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 const morgan = require("morgan");
+const cron = require("node-cron");
 const port = process.env.PORT || 8000;
 
 // middleware
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: [
+    "http://localhost:5173",
+    "https://stay-vista-akib.web.app",
+    "https://stay-vista-akib.firebaseapp.com",
+  ],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -42,12 +48,32 @@ const client = new MongoClient(process.env.DB_URI, {
     deprecationErrors: true,
   },
 });
+
 async function run() {
   try {
     //! Collections
     const usersCollection = client.db("StayVistaDB").collection("Users");
     const roomsCollection = client.db("StayVistaDB").collection("Rooms");
     const bookingsCollection = client.db("StayVistaDB").collection("Bookings");
+    const paymentsCollection = client.db("StayVistaDB").collection("Payments");
+    const testCollection = client.db("StayVistaDB").collection("Test");
+
+    //!Test
+    // cron.schedule("23 21 * * *", async () => {
+    //   const users = await usersCollection.find({}).toArray();
+    //   for (const user of users) {
+    //     await testCollection.insertOne({ reason: "test", data: user });
+    //   }
+    //   console.log("A Big Done");
+    // });
+    // cron.schedule("*/10 * * * * *", async () => {
+    //   const date = await testCollection.find().toArray();
+    //   console.log(new Date(date[0].date).getDate());
+    // });
+
+    // app.post("/dateTest", async (req, res) => {
+    //   await testCollection.insertOne(await req.body);
+    // });
 
     //! Create Token by JWT
     app.post("/jwt", async (req, res) => {
@@ -135,6 +161,7 @@ async function run() {
       res.send(reservations);
     });
 
+    //! Make Bookings
     app.post("/add-bookings", async (req, res) => {
       try {
         const data = await req.body;
@@ -143,12 +170,84 @@ async function run() {
           roomId: data.roomId,
           startDate: data.startDate,
           endDate: data.endDate,
+          price: data.price,
+          status: "due",
         });
-        res.send(result);
+        const bookingId = result.insertedId.toString();
+        const tran_id = new ObjectId().toString();
+        const sslData = {
+          total_amount: data.price,
+          currency: "BDT",
+          tran_id,
+          success_url: `${process.env.SERVER_LINK}/payment-success/${tran_id}/${bookingId}`,
+          fail_url: "http://localhost:3030/fail",
+          cancel_url: "http://localhost:3030/cancel",
+          ipn_url: "http://localhost:3030/ipn",
+          shipping_method: "Courier",
+          product_name: "Computer.",
+          product_category: "Electronic",
+          product_profile: "general",
+          cus_name: "Customer Name",
+          cus_email: "customer@example.com",
+          cus_add1: "Dhaka",
+          cus_add2: "Dhaka",
+          cus_city: "Dhaka",
+          cus_state: "Dhaka",
+          cus_postcode: "1000",
+          cus_country: "Bangladesh",
+          cus_phone: "01711111111",
+          cus_fax: "01711111111",
+          ship_name: "Customer Name",
+          ship_add1: "Dhaka",
+          ship_add2: "Dhaka",
+          ship_city: "Dhaka",
+          ship_state: "Dhaka",
+          ship_postcode: 1000,
+          ship_country: "Bangladesh",
+        };
+        const sslcz = new ssl(
+          process.env.SSL_STORE_ID,
+          process.env.SSL_STORE_PASSWORD,
+          false
+        );
+        const apiResponse = await sslcz.init(sslData);
+        res.send({ url: apiResponse.GatewayPageURL });
       } catch (error) {
         console.log(error);
         res.status(500).send({ message: "Internal Server Error" });
       }
+    });
+    //! Payment Success
+    app.post("/payment-success/:tranId/:bookingId", async (req, res) => {
+      await paymentsCollection.insertOne({
+        TransactionId: req.params.tranId,
+        bookingId: req.params.bookingId,
+      });
+      const data = await bookingsCollection.updateOne(
+        { _id: new ObjectId(req.params.bookingId) },
+        {
+          $set: {
+            status: "paid",
+          },
+        }
+      );
+      if (data.modifiedCount > 0) {
+        res.redirect(process.env.CLIENT_LINK);
+      }
+    });
+    //! Get transaction Details
+    app.get("/transaction-query-by-transaction-id", (req, res) => {
+      const data = {
+        tran_id: "658ff5aed9a3063d7b9afc56",
+      };
+      const sslcz = new ssl(
+        process.env.SSL_STORE_ID,
+        process.env.SSL_STORE_PASSWORD,
+        false
+      );
+      sslcz.transactionQueryByTransactionId(data).then((data) => {
+        console.log(data);
+      });
     });
 
     // Send a ping to confirm a successful connection

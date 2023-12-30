@@ -54,7 +54,7 @@ const RoomInfo = ({
       <hr />
       <div
         className="
-          text-lg font-light text-neutral-500"
+          text-lg font-light text-neutral-500 text-justify"
       >
         {roomData.description}
       </div>
@@ -64,29 +64,29 @@ const RoomInfo = ({
           <p>Check In:</p>
           <DatePicker
             className={"w-[95%]"}
-            format="dd-MMM-y"
+            format="dd - MM - y"
             onChange={selectStartDate}
             value={startDate}
             calendarIcon={<LuCalendarPlus className="text-2xl" />}
             clearIcon={null}
-            onInvalidChange={() => alert("Invalid")}
-            dayPlaceholder="D"
-            monthPlaceholder="M"
-            yearPlaceholder="Y"
+            // onInvalidChange={() => alert("Invalid")}
+            dayPlaceholder="dd"
+            monthPlaceholder="mm"
+            yearPlaceholder="yyyy"
           />
         </div>
         <div className="w-1/2">
           <p>Check Out:</p>
           <DatePicker
             className={"w-[95%]"}
-            format="dd-MMM-y"
+            format="dd - MM - y"
             onChange={selectEndDate}
             value={endDate}
             calendarIcon={<LuCalendarMinus className="text-2xl" />}
-            clearIcon={null}
-            dayPlaceholder="D"
-            monthPlaceholder="M"
-            yearPlaceholder="Y"
+            clearIcon={"X"}
+            dayPlaceholder="dd"
+            monthPlaceholder="mm"
+            yearPlaceholder="yyyy"
           />
         </div>
       </div>

@@ -2,8 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Modal from "react-modal";
 import { useParams } from "react-router-dom";
 import publicAxios from "../../API/publicAxios";
+import Button from "../../components/Button/Button";
 import Header from "../../components/RoomDetails/Header";
 import RoomInfo from "../../components/RoomDetails/RoomInfo";
 import RoomReservation from "../../components/RoomDetails/RoomReservation";
@@ -14,7 +16,30 @@ import useUser from "../../hooks/useUser";
 const DetailsPage = () => {
   const { id } = useParams();
   const user = useUser();
-
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [error, setError] = useState("");
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
+  // const axiosInstance = usePublicAxios();
+  //! Variables for Confirmation Modal
+  const customStyles = {
+    content: {
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+  //! Getting the room Data
   const { data: room } = useQuery({
     queryKey: ["room", id],
     queryFn: async () => {
@@ -22,7 +47,7 @@ const DetailsPage = () => {
       return res.data;
     },
   });
-
+  //! Getting all reservationsData for this room
   const { data: reservationData, refetch: reservationDataRefetch } = useQuery({
     queryKey: ["reservations", id],
     queryFn: async ({ queryKey }) => {
@@ -30,40 +55,23 @@ const DetailsPage = () => {
       return res.data;
     },
   });
+  //! Getting all reservations for this room
   const reservations = reservationData?.map(({ _id, startDate, endDate }) => ({
     key: _id,
     startDate: moment(startDate)._d,
     endDate: moment(endDate)._d,
-    color: "#F43F5E",
+    color: "#9447D6",
   }));
-
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [error, setError] = useState("");
-
-  //!!!!!!!!!!!!!!!!!!!!!!
-
-  const [startDate, setStartDate] = useState(moment());
-  const [endDate, setEndDate] = useState();
-
-  const addBookings = async () => {
-    await publicAxios.post("/add-bookings", {
-      userId: user._id,
-      roomId: id,
-      startDate,
-      endDate,
-    });
-    setTotalPrice(0);
-    setCurrentValue({
-      startDate: moment.now(),
-      endDate: moment.now(),
-      key: "current",
-      color: "green",
-    });
-    await reservationDataRefetch();
-    toast.success("Bookings Confirmed");
-  };
-
+  //! Selecting Check In Date
   const selectStartDate = (data) => {
+    setTotalPrice(0);
+    if (endDate && moment(endDate).isBefore(moment(data))) {
+      setError("Check 'Check-Out' Date");
+      setTimeout(() => {
+        setError("");
+      }, 2000);
+      return;
+    }
     if (moment().isSameOrBefore(moment(data), "days")) {
       setError("");
       setStartDate(data);
@@ -75,16 +83,17 @@ const DetailsPage = () => {
       }, 2000);
     }
   };
-
+  //! Selecting Check Out Date
   const selectEndDate = (data) => {
+    setTotalPrice(0);
     if (moment(startDate).isSame(moment(data), "days")) {
-      setError("Check Out date can not be same as Check In date");
+      setError("Check 'Check-In' Date");
       setTimeout(() => {
         setError("");
       }, 2000);
       return;
     } else if (moment(startDate).isAfter(moment(data), "days")) {
-      setError("Check Out date should come after Check In date");
+      setError("Check 'Check-In' Date");
       setTimeout(() => {
         setError("");
       }, 2000);
@@ -93,18 +102,22 @@ const DetailsPage = () => {
     setError("");
     setEndDate(data);
   };
-
+  //! Set dates for reserve
   const [currentValue, setCurrentValue] = useState({
     startDate: moment.now(),
     endDate: moment.now(),
     key: "current",
-    color: "green",
+    color: "",
   });
-
+  //! Availability checker
   const currentReserve = () => {
-    if (moment(startDate).isSame(moment(endDate), "days")) {
+    if (startDate == undefined) {
       setTotalPrice(0);
-      alert("Invalid Input");
+      toast.error("Please select check-in date!");
+      return;
+    } else if (endDate == undefined) {
+      setTotalPrice(0);
+      toast.error("Please select check-out date!");
       return;
     }
 
@@ -129,7 +142,7 @@ const DetailsPage = () => {
           startDate: moment.now(),
           endDate: moment.now(),
           key: "current",
-          color: "green",
+          color: "",
         });
         return;
       }
@@ -141,22 +154,100 @@ const DetailsPage = () => {
       key: "current",
       color: "",
     });
+    console.log(startDate);
+    console.log(endDate);
 
     const totalDays = moment(endDate).diff(moment(startDate), "days");
-    // console.log(totalDays);
-    const TempTotalPrice = (parseInt(totalDays) + 1) * parseInt(room.price);
+    console.log(totalDays);
+    const TempTotalPrice = parseInt(totalDays) * parseInt(room.price);
     setTotalPrice(TempTotalPrice);
   };
-
+  //! Confirm Bookings
+  const confirmBookings = async () => {
+    openModal();
+  };
+  //! Add Bookings
+  const addBookings = async () => {
+    // const data = {
+    //   userId: user._id,
+    //   roomId: id,
+    //   startDate,
+    //   endDate,
+    //   price: totalPrice,
+    // };
+    // console.log(data);
+    const res = await publicAxios.post("/add-bookings", {
+      userId: user._id,
+      roomId: id,
+      startDate,
+      endDate,
+      price: totalPrice,
+    });
+    window.location.replace(res.data.url);
+    setTotalPrice(0);
+    setCurrentValue({
+      startDate: moment.now(),
+      endDate: moment.now(),
+      key: "current",
+      color: "",
+    });
+    await reservationDataRefetch();
+    closeModal();
+    toast.success("Processing....");
+  };
   if (!room || !reservations || !reservationData || !user) return <Loader />;
   return (
     <Container>
-      <button
-        className="hidden"
-        onClick={() => toast.success("Bookings Confirmed")}
+      <Button
+        title="Test"
+        onClick={async () => {
+          await publicAxios.get("/transaction-query-by-transaction-id");
+        }}
+      />
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
       >
-        Test
-      </button>
+        <div className="p-10 space-y-3">
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">Name:</p> <p>{user.name}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">E-mail:</p> <p>{user.email}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">Room Name:</p> <p>{room.title}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">Check In:</p>{" "}
+            <p>
+              {new Date(startDate).getDate()}-
+              {new Date(startDate).getMonth() + 1}-
+              {new Date(startDate).getFullYear()}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">Check Out:</p>{" "}
+            <p>
+              {new Date(endDate).getDate()}-{new Date(endDate).getMonth() + 1}-
+              {new Date(endDate).getFullYear()}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">Nights Count:</p>{" "}
+            <p>{moment(endDate).diff(moment(startDate), "days")}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">Total Price:</p>{" "}
+            <p>{totalPrice}/- BDT</p>
+          </div>
+          <div className="flex gap-4 pt-5">
+            <Button onClick={closeModal} label={"Revise"} />
+            <Button onClick={addBookings} label={"Confirm & Pay"} />
+          </div>
+        </div>
+      </Modal>
       <div className="max-w-screen-lg mx-auto">
         <div className="flex flex-col gap-6">
           <Header roomData={room} />
@@ -173,7 +264,7 @@ const DetailsPage = () => {
           />
           <div className="col-span-3">
             <RoomReservation
-              addBookings={addBookings}
+              confirmBookings={confirmBookings}
               reservations={reservations}
               currentValue={currentValue}
               room={room}

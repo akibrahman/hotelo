@@ -1,18 +1,18 @@
 /* eslint-disable react/prop-types */
-import { ScaleLoader } from 'react-spinners'
+import { ScaleLoader } from "react-spinners";
 
 const Loader = ({ smallHeight }) => {
   return (
     <div
-      className={` ${smallHeight ? 'h-[250px]' : 'h-[70vh]'}
+      className={` ${smallHeight ? "h-[250px]" : "h-[70vh]"}
       flex 
       flex-col 
       justify-center 
       items-center `}
     >
-      <ScaleLoader size={100} color='red' />
+      <ScaleLoader size={100} color="#9447D6" />
     </div>
-  )
-}
+  );
+};
 
-export default Loader
+export default Loader;
