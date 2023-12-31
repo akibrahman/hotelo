@@ -20,8 +20,8 @@ const MyBookings = () => {
   if (!bookings) return <Loader />;
 
   return (
-    <div className="p-6 w-[95%] mx-auto">
-      <h2 className="text-2xl font-semibold mb-8">My Bookings</h2>
+    <div className="flex flex-col items-center mt-8 w-[95%]">
+      <h2 className="text-2xl font-bold mb-10">Bookings</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {bookings.map((booking) => (
           <div
@@ -44,8 +44,8 @@ const MyBookings = () => {
               <p>{booking.room.title}</p>
               <p>{booking.price}/- BDT</p>
               <p>
-                {new Date(booking.startDate).toLocaleDateString()} -{" "}
-                {new Date(booking.endDate).toLocaleDateString()}
+                {new Date(booking.startDate).toDateString()} -{" "}
+                {new Date(booking.endDate).toDateString()}
               </p>
               <p className="bg-primary px-4 text-white w-max rounded-full">
                 {booking.status}

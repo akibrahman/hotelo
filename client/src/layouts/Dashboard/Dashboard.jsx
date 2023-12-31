@@ -40,7 +40,7 @@ const Dashboard = () => {
               <NavLink to="/dashboard/my-bookings">My Bookings</NavLink>
             </li>
             <li className="rounded-md border-b-2 border-primary">
-              <a>My Payments</a>
+              <NavLink to="/dashboard/my-payments">My Payments</NavLink>
             </li>
           </ul>
         </ul>

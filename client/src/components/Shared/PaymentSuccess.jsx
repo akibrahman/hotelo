@@ -59,19 +59,11 @@ const PaymentSuccess = () => {
           </div>
           <div className="flex items-center gap-2">
             <p className="font-semibold">Check In:</p>{" "}
-            <p>
-              {new Date(data.checkIn).getDate()}-
-              {new Date(data.checkIn).getMonth() + 1}-
-              {new Date(data.checkIn).getFullYear()}
-            </p>
+            <p>{new Date(data.checkIn).toDateString()}</p>
           </div>
           <div className="flex items-center gap-2">
             <p className="font-semibold">Check Out:</p>{" "}
-            <p>
-              {new Date(data.checkOut).getDate()}-
-              {new Date(data.checkOut).getMonth() + 1}-
-              {new Date(data.checkOut).getFullYear()}
-            </p>
+            <p>{new Date(data.checkOut).toDateString()}</p>
           </div>
           <div className="flex items-center gap-2">
             <p className="font-semibold">Nights Count:</p>{" "}

@@ -7,6 +7,7 @@ import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
 import MyBookings from "../pages/MyBookings";
+import MyPayments from "../pages/MyPayments";
 import MyProfile from "../pages/MyProfile";
 import SignUp from "../pages/SignUp/SignUp";
 import UserPrivateRoute from "./UserPrivateRoute";
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
       {
         path: "my-bookings",
         element: <MyBookings />,
+      },
+      {
+        path: "my-payments",
+        element: <MyPayments />,
       },
     ],
   },

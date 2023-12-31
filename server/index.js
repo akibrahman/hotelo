@@ -168,6 +168,7 @@ async function run() {
         const result = await bookingsCollection.insertOne({
           userId: data.userId,
           roomId: data.roomId,
+          bookingDate: new Date().toISOString(),
           startDate: data.startDate,
           endDate: data.endDate,
           price: data.price,
@@ -180,7 +181,7 @@ async function run() {
           total_amount: data.price,
           currency: "BDT",
           tran_id,
-          success_url: `${process.env.SERVER_LINK}/payment-success/${tran_id}/${bookingId}/${data.userId}`,
+          success_url: `${process.env.SERVER_LINK}/payment-success/${tran_id}/${bookingId}/${data.userId}/${data.price}`,
           fail_url: "http://localhost:3030/fail",
           cancel_url: "http://localhost:3030/cancel",
           ipn_url: "http://localhost:3030/ipn",
@@ -220,13 +221,15 @@ async function run() {
     });
     //! Payment Success
     app.post(
-      "/payment-success/:tranId/:bookingId/:userId",
+      "/payment-success/:tranId/:bookingId/:userId/:amount",
       async (req, res) => {
         try {
           await paymentsCollection.insertOne({
-            UserId: req.params.userId,
-            TransactionId: req.params.tranId,
+            userId: req.params.userId,
+            amount: parseFloat(req.params.amount),
+            transactionId: req.params.tranId,
             bookingId: req.params.bookingId,
+            paymentDate: new Date().toISOString(),
           });
           await bookingsCollection.updateOne(
             { _id: new ObjectId(req.params.bookingId) },
@@ -330,7 +333,7 @@ async function run() {
         }
       }
     );
-    //! Get transaction Details
+    //! Get My Bookings
     app.get("/my-bookings/:userId", async (req, res) => {
       try {
         const userId = req.params.userId;
@@ -366,6 +369,104 @@ async function run() {
       } catch (error) {
         console.log(error);
         res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
+    //! Get My Payments
+    app.get("/my-payments/:userId", async (req, res) => {
+      try {
+        const userId = req.params.userId;
+        console.log(userId);
+        const payments = await paymentsCollection
+          .aggregate([
+            {
+              $match: { userId },
+            },
+          ])
+          .toArray();
+        res.send(payments);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
+    //!Get One Payment Details
+    app.get("/payment-details/:tranId", async (req, res) => {
+      try {
+        const sslcz = new ssl(
+          process.env.SSL_STORE_ID,
+          process.env.SSL_STORE_PASSWORD,
+          false
+        );
+        const data = await sslcz.transactionQueryByTransactionId({
+          tran_id: req.params.tranId,
+        });
+        res.send(data);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
+    //!Get One Booking Details
+    app.get("/booking-details/:bookingId", async (req, res) => {
+      try {
+        const booking = await bookingsCollection
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(req.params.bookingId),
+              },
+            },
+            {
+              $addFields: {
+                roomIdObj: {
+                  $convert: {
+                    input: "$roomId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Rooms",
+                localField: "roomIdObj",
+                foreignField: "_id",
+                as: "room",
+              },
+            },
+            {
+              $unwind: "$room",
+            },
+          ])
+          .toArray();
+        res.send(booking);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
+    //! Cron Schedule
+    cron.schedule("0 0 * * *", async () => {
+      console.log("Started");
+      const bookings = await bookingsCollection.find({}).toArray();
+      for (const booking of bookings) {
+        //!
+        const thatDat = new Date(booking.startDate);
+        const today = new Date();
+        if (
+          thatDat.getFullYear() === today.getFullYear() &&
+          thatDat.getMonth() === today.getMonth() &&
+          thatDat.getDate() === today.getDate()
+        ) {
+          await bookingsCollection.updateOne(
+            { _id: new ObjectId(booking._id) },
+            { $set: { enjoyed: true } }
+          );
+        }
       }
     });
   } finally {
