@@ -70,9 +70,9 @@ const RoomInfo = ({
             calendarIcon={<LuCalendarPlus className="text-2xl" />}
             clearIcon={null}
             // onInvalidChange={() => alert("Invalid")}
-            dayPlaceholder="dd"
-            monthPlaceholder="mm"
-            yearPlaceholder="yyyy"
+            dayPlaceholder="01"
+            monthPlaceholder="01"
+            yearPlaceholder="2005"
           />
         </div>
         <div className="w-1/2">
@@ -84,9 +84,9 @@ const RoomInfo = ({
             value={endDate}
             calendarIcon={<LuCalendarMinus className="text-2xl" />}
             clearIcon={<FaTimes />}
-            dayPlaceholder="dd"
-            monthPlaceholder="mm"
-            yearPlaceholder="yyyy"
+            dayPlaceholder="01"
+            monthPlaceholder="01"
+            yearPlaceholder="2005"
           />
         </div>
       </div>

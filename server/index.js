@@ -179,7 +179,7 @@ async function run() {
           total_amount: data.price,
           currency: "BDT",
           tran_id,
-          success_url: `${process.env.SERVER_LINK}/payment-success/${tran_id}/${bookingId}`,
+          success_url: `${process.env.SERVER_LINK}/payment-success/${tran_id}/${bookingId}/${data.userId}`,
           fail_url: "http://localhost:3030/fail",
           cancel_url: "http://localhost:3030/cancel",
           ipn_url: "http://localhost:3030/ipn",
@@ -218,111 +218,117 @@ async function run() {
       }
     });
     //! Payment Success
-    app.post("/payment-success/:tranId/:bookingId", async (req, res) => {
-      try {
-        await paymentsCollection.insertOne({
-          TransactionId: req.params.tranId,
-          bookingId: req.params.bookingId,
-        });
-        await bookingsCollection.updateOne(
-          { _id: new ObjectId(req.params.bookingId) },
-          {
-            $set: {
-              status: "paid",
-            },
-          }
-        );
-        //!
-        const data1 = await bookingsCollection
-          .aggregate([
+    app.post(
+      "/payment-success/:tranId/:bookingId/:userId",
+      async (req, res) => {
+        try {
+          await paymentsCollection.insertOne({
+            UserId: req.params.userId,
+            TransactionId: req.params.tranId,
+            bookingId: req.params.bookingId,
+          });
+          await bookingsCollection.updateOne(
+            { _id: new ObjectId(req.params.bookingId) },
             {
-              $match: {
-                _id: new ObjectId(req.params.bookingId),
+              $set: {
+                status: "paid",
               },
-            },
-            {
-              $addFields: {
-                userIdObj: {
-                  $convert: {
-                    input: "$userId",
-                    to: "objectId",
+            }
+          );
+          //!
+          const data1 = await bookingsCollection
+            .aggregate([
+              {
+                $match: {
+                  _id: new ObjectId(req.params.bookingId),
+                },
+              },
+              {
+                $addFields: {
+                  userIdObj: {
+                    $convert: {
+                      input: "$userId",
+                      to: "objectId",
+                    },
                   },
                 },
               },
-            },
-            {
-              $lookup: {
-                from: "Users",
-                localField: "userIdObj",
-                foreignField: "_id",
-                as: "user",
+              {
+                $lookup: {
+                  from: "Users",
+                  localField: "userIdObj",
+                  foreignField: "_id",
+                  as: "user",
+                },
               },
-            },
-            {
-              $unwind: "$user",
-            },
-            {
-              $addFields: {
-                roomIdObj: {
-                  $convert: {
-                    input: "$roomId",
-                    to: "objectId",
+              {
+                $unwind: "$user",
+              },
+              {
+                $addFields: {
+                  roomIdObj: {
+                    $convert: {
+                      input: "$roomId",
+                      to: "objectId",
+                    },
                   },
                 },
               },
-            },
-            {
-              $lookup: {
-                from: "Rooms",
-                localField: "roomIdObj",
-                foreignField: "_id",
-                as: "room",
+              {
+                $lookup: {
+                  from: "Rooms",
+                  localField: "roomIdObj",
+                  foreignField: "_id",
+                  as: "room",
+                },
               },
-            },
-            {
-              $unwind: "$room",
-            },
-          ])
-          .toArray();
-        //!
-        const sslcz = new ssl(
-          process.env.SSL_STORE_ID,
-          process.env.SSL_STORE_PASSWORD,
-          false
-        );
-        const data2 = await sslcz.transactionQueryByTransactionId({
-          tran_id: req.params.tranId,
-        });
-        //!
-        const mainData = {
-          tran_id: req.params.tranId,
-          name: data1[0].user.name,
-          email: data1[0].user.email,
-          roomName: data1[0].room.title,
-          checkIn: data1[0].startDate,
-          checkOut: data1[0].endDate,
-          price: data1[0].price,
-          tran_date: data2.element[0].tran_date,
-          card_type: data2.element[0].card_type,
-          bank_gw: data2.element[0].bank_gw,
-          val_id: data2.element[0].val_id,
-          status: data2.element[0].status,
-          currency_type: data2.element[0].currency_type,
-        };
-        const queryString = Object.keys(mainData)
-          .map(
-            (key) =>
-              `${encodeURIComponent(key)}=${encodeURIComponent(mainData[key])}`
-          )
-          .join("&");
-        res.redirect(
-          `${process.env.CLIENT_LINK}/payment-success/${req.params.tranId}?${queryString}`
-        );
-      } catch (error) {
-        console.log(error);
-        res.status(500).send({ message: "Internal Server Error" });
+              {
+                $unwind: "$room",
+              },
+            ])
+            .toArray();
+          //!
+          const sslcz = new ssl(
+            process.env.SSL_STORE_ID,
+            process.env.SSL_STORE_PASSWORD,
+            false
+          );
+          const data2 = await sslcz.transactionQueryByTransactionId({
+            tran_id: req.params.tranId,
+          });
+          //!
+          const mainData = {
+            tran_id: req.params.tranId,
+            name: data1[0].user.name,
+            email: data1[0].user.email,
+            roomName: data1[0].room.title,
+            checkIn: data1[0].startDate,
+            checkOut: data1[0].endDate,
+            price: data1[0].price,
+            tran_date: data2.element[0].tran_date,
+            card_type: data2.element[0].card_type,
+            bank_gw: data2.element[0].bank_gw,
+            val_id: data2.element[0].val_id,
+            status: data2.element[0].status,
+            currency_type: data2.element[0].currency_type,
+          };
+          const queryString = Object.keys(mainData)
+            .map(
+              (key) =>
+                `${encodeURIComponent(key)}=${encodeURIComponent(
+                  mainData[key]
+                )}`
+            )
+            .join("&");
+          res.redirect(
+            `${process.env.CLIENT_LINK}/payment-success/${req.params.tranId}?${queryString}`
+          );
+        } catch (error) {
+          console.log(error);
+          res.status(500).send({ message: "Internal Server Error" });
+        }
       }
-    });
+    );
     //! Get transaction Details
     app.get("/abc", (req, res) => {
       //!----------

@@ -1,10 +1,11 @@
+import moment from "moment";
 import { Link, useParams } from "react-router-dom";
 
 const PaymentSuccess = () => {
   const { tranId } = useParams();
   const queryParams = new URLSearchParams(window.location.search);
-  const additionalData = Object.fromEntries(queryParams.entries());
-  console.log(additionalData);
+  const data = Object.fromEntries(queryParams.entries());
+  //   console.log(additionalData);
   return (
     <div className="flex gap-4 w-[95%] mx-auto">
       <div className="w-1/2 flex flex-col gap-4">
@@ -45,41 +46,37 @@ const PaymentSuccess = () => {
 
         <div className="p-10 space-y-3 border border-primary rounded-md">
           <div className="flex items-center gap-2">
-            {/* <p className="font-semibold">Name:</p> <p>{user.name}</p> */}
-            <p className="font-semibold">Name:</p> <p>Akib</p>
+            <p className="font-semibold">Name:</p> <p>{data.name}</p>
           </div>
           <div className="flex items-center gap-2">
-            {/* <p className="font-semibold">E-mail:</p> <p>{user.email}</p> */}
-            <p className="font-semibold">E-mail:</p> <p>Customer Email</p>
+            <p className="font-semibold">E-mail:</p> <p>{data.email}</p>
           </div>
           <div className="flex items-center gap-2">
-            {/* <p className="font-semibold">Room Name:</p> <p>{room.title}</p> */}
-            <p className="font-semibold">Room Name:</p> <p>Bolbo na go</p>
+            <p className="font-semibold">Room Name:</p> <p>{data.roomName}</p>
           </div>
           <div className="flex items-center gap-2">
             <p className="font-semibold">Check In:</p>{" "}
-            {/* <p>
-              {new Date(startDate).getDate()}-
-              {new Date(startDate).getMonth() + 1}-
-              {new Date(startDate).getFullYear()}
-            </p> */}
-            <p>12-12-22</p>
+            <p>
+              {new Date(data.checkIn).getDate()}-
+              {new Date(data.checkIn).getMonth() + 1}-
+              {new Date(data.checkIn).getFullYear()}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <p className="font-semibold">Check Out:</p>{" "}
-            {/* <p>
-              {new Date(endDate).getDate()}-{new Date(endDate).getMonth() + 1}-
-              {new Date(endDate).getFullYear()}
-            </p> */}
-            <p>12-12-22</p>
+            <p>
+              {new Date(data.checkOut).getDate()}-
+              {new Date(data.checkOut).getMonth() + 1}-
+              {new Date(data.checkOut).getFullYear()}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <p className="font-semibold">Nights Count:</p>{" "}
-            {/* <p>{moment(endDate).diff(moment(startDate), "days")}</p> */}
-            <p>3</p>
+            <p>{moment(data.checkOut).diff(moment(data.checkIn), "days")}</p>
           </div>
           <div className="flex items-center gap-2">
-            <p className="font-semibold">Total Price:</p> <p>330/- BDT</p>
+            <p className="font-semibold">Total Price:</p>{" "}
+            <p>{data.price}/- BDT</p>
           </div>
         </div>
       </div>
@@ -92,63 +89,55 @@ const PaymentSuccess = () => {
         <div className="flex justify-between mb-6">
           <div>
             <p className="font-semibold">From:</p>
-            <p>Your Company Name</p>
+            <p>Hotelo</p>
             <p>123 Main Street</p>
-            <p>City, State, Zip Code</p>
-            <p>Email: your@email.com</p>
+            <p>Uttara, Dhaka, 1230</p>
+            <p>Email: hotelo@email.com</p>
           </div>
 
           <div>
             <p className="font-semibold">To:</p>
-            <p>Client Name</p>
+            <p>{data.name}</p>
             <p>456 Client Street</p>
-            <p>City, State, Zip Code</p>
-            <p>Email: client@email.com</p>
+            <p>Uttara, Dhaka, 1230</p>
+            <p>Email: {data.email}</p>
           </div>
         </div>
 
         <div className="flex justify-end mb-4">
           <p className="font-semibold">Total:</p>
           {/* <p className="ml-2">${amount}</p> */}
-          <p className="ml-2">$33</p>
+          <p className="ml-2">{data.price} BDT</p>
         </div>
 
         <div>
           <p className="font-semibold">Payment Details:</p>
-          {/* <p><strong>Transaction ID:</strong> {tran_id}</p>
-  <p><strong>Transaction Date:</strong> {tran_date}</p>
-  <p><strong>Card Type:</strong> {card_type}</p>
-  <p><strong>Bank Gateway:</strong> {bank_gw}</p>
-  <p><strong>Validation ID:</strong> {val_id}</p>
-  <p><strong>Status:</strong> {statuss}</p>
-  <p><strong>Validated On:</strong> {validated_on}</p>
-  <p><strong>Currency Type:</strong> {currency_type}</p> */}
           <p>
-            <strong>Transaction ID:</strong> sssss
+            <strong>Transaction ID:</strong> {data.tran_id}
           </p>
           <p>
-            <strong>Transaction Date:</strong> 33-33-33
+            <strong>Transaction Date:</strong> {data.tran_date}
           </p>
           <p>
-            <strong>Card Type:</strong> sss
+            <strong>Card Type:</strong> {data.card_type}
           </p>
           <p>
-            <strong>Bank Gateway:</strong> sss
+            <strong>Bank Gateway:</strong> {data.bank_gw}
           </p>
           <p>
-            <strong>Validation ID:</strong> ssss
+            <strong>Validation ID:</strong> {data.val_id}
           </p>
           <p>
-            <strong>Status:</strong> sddd
+            <strong>Status:</strong> {data.status}
           </p>
           <p>
-            <strong>Currency Type:</strong> ddd
+            <strong>Currency Type:</strong> {data.currency_type}
           </p>
         </div>
 
-        <div>
+        <div className="flex gap-2">
           <p className="font-semibold">Notes:</p>
-          <p>Thank you for your business!</p>
+          <span>Thank you for choosing us!</span>
         </div>
       </div>
     </div>
