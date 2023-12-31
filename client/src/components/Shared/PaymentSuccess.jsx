@@ -31,9 +31,12 @@ const PaymentSuccess = () => {
               Thank you for your payment. Your room reservation is confirmed.
             </p>
             <div className="flex justify-center space-x-4">
-              <button className="bg-white text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 focus:outline-none focus:ring focus:border-purple-300">
+              <Link
+                to={`${import.meta.env.VITE_client}/dashboard/my-bookings`}
+                className="bg-white text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 focus:outline-none focus:ring focus:border-purple-300"
+              >
                 See Bookings
-              </button>
+              </Link>
               <Link
                 to={import.meta.env.VITE_client}
                 className="bg-white text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 focus:outline-none focus:ring focus:border-purple-300"

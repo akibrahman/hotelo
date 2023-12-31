@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import useUser from "../../hooks/useUser";
 
 const Dashboard = () => {
@@ -7,30 +7,8 @@ const Dashboard = () => {
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col items-center justify-center">
+      <div className="drawer-content flex flex-col items-center justify-start">
         {/* Page content here */}
-        {/* <div className="flex-1 p-6 w-[95%] mx-auto">
-          <h2 className="text-2xl font-semibold mb-4">Analytics Dashboard</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold mb-2">Total Users</h3>
-              <p className="text-3xl font-bold">1,234</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold mb-2">Revenue</h3>
-              <p className="text-3xl font-bold">$50,000</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold mb-2">Page Views</h3>
-              <p className="text-3xl font-bold">100,000</p>
-            </div>
-          </div>
-          <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-            <div className="w-full h-64 bg-gray-300"></div>
-          </div>
-        </div> */}
         <Outlet />
         <label
           htmlFor="my-drawer-2"
@@ -46,17 +24,20 @@ const Dashboard = () => {
           className="drawer-overlay"
         ></label>
         <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-          <div className="bg-primary text-center text-white p-4 rounded-md mb-10">
+          <Link
+            to="/"
+            className="bg-primary text-center text-white p-4 rounded-md mb-10"
+          >
             <p className="text-4xl mb-">Hotelo LTD.</p>
             <p className="">The Best you can Stay</p>
-          </div>
+          </Link>
           {/* Sidebar content here */}
           <ul className="font-semibold space-y-4">
             <li className="rounded-md border-b-2 border-primary">
-              <Link to="/dashboard/my-profile">My Profile</Link>
+              <NavLink to="/dashboard/my-profile">My Profile</NavLink>
             </li>
             <li className="rounded-md border-b-2 border-primary">
-              <a>My Bookings</a>
+              <NavLink to="/dashboard/my-bookings">My Bookings</NavLink>
             </li>
             <li className="rounded-md border-b-2 border-primary">
               <a>My Payments</a>

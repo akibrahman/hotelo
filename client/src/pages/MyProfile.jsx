@@ -18,23 +18,23 @@ const MyProfile = () => {
 
         {/* User Information */}
         <div className="text-center mb-4">
-          <h2 className="text-2xl font-semibold">John Doe</h2>
-          <p className="text-gray-500">Web Developer</p>
+          <h2 className="text-2xl font-semibold">{user.name}</h2>
+          <p className="text-gray-500">{user.role}</p>
         </div>
 
         {/* Additional Details */}
         <div>
           <div className="flex justify-between items-center mb-2">
             <span className="font-semibold">Email:</span>
-            <span>john.doe@example.com</span>
+            <span>{user.email}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
             <span className="font-semibold">Phone:</span>
-            <span>(123) 456-7890</span>
+            <span>{user.phone}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
             <span className="font-semibold">Location:</span>
-            <span>New York, USA</span>
+            <span>{user.address}</span>
           </div>
           {/* Add more details as needed */}
         </div>

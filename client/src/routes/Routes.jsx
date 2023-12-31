@@ -6,6 +6,7 @@ import DetailsPage from "../pages/DetailsPage/DetailsPage";
 import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
+import MyBookings from "../pages/MyBookings";
 import MyProfile from "../pages/MyProfile";
 import SignUp from "../pages/SignUp/SignUp";
 import UserPrivateRoute from "./UserPrivateRoute";
@@ -51,6 +52,10 @@ export const router = createBrowserRouter([
       {
         path: "my-profile",
         element: <MyProfile />,
+      },
+      {
+        path: "my-bookings",
+        element: <MyBookings />,
       },
     ],
   },

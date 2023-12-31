@@ -172,6 +172,7 @@ async function run() {
           endDate: data.endDate,
           price: data.price,
           status: "due",
+          enjoyed: false,
         });
         const bookingId = result.insertedId.toString();
         const tran_id = new ObjectId().toString();
@@ -330,32 +331,43 @@ async function run() {
       }
     );
     //! Get transaction Details
-    app.get("/abc", (req, res) => {
-      //!----------
-      const additionalData = {
-        key1: "value1",
-        key2: "value2",
-        // Add more key-value pairs as needed
-      };
-      const queryString = Object.keys(additionalData)
-        .map(
-          (key) =>
-            `${encodeURIComponent(key)}=${encodeURIComponent(
-              additionalData[key]
-            )}`
-        )
-        .join("&");
-      console.log(queryString);
-      // res.redirect(`${process.env.CLIENT_LINK}/payment-success/${req.params.tranId}?${queryString}`);
-
-      //!----------
+    app.get("/my-bookings/:userId", async (req, res) => {
+      try {
+        const userId = req.params.userId;
+        const bookings = await bookingsCollection
+          .aggregate([
+            {
+              $match: { userId },
+            },
+            {
+              $addFields: {
+                roomIdObj: {
+                  $convert: {
+                    input: "$roomId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Rooms",
+                localField: "roomIdObj",
+                foreignField: "_id",
+                as: "room",
+              },
+            },
+            {
+              $unwind: "$room",
+            },
+          ])
+          .toArray();
+        res.send(bookings);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
-
-    // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    // console.log(
-    //   "Pinged your deployment. You successfully connected to MongoDB!"
-    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();

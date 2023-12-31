@@ -1,5 +1,14 @@
 /* eslint-disable react/prop-types */
-const Button = ({ label, onClick, disabled, outline, small, icon: Icon }) => {
+const Button = ({
+  label,
+  onClick,
+  disabled,
+  outline,
+  small,
+  icon: Icon,
+  bg,
+  text,
+}) => {
   return (
     <button
       disabled={disabled}
@@ -13,13 +22,14 @@ const Button = ({ label, onClick, disabled, outline, small, icon: Icon }) => {
           transition
           px-4
           w-full
-          ${outline ? "bg-white" : "bg-purple-700"}
-          ${outline ? "border-black" : "bg-purple-700"}
+          ${outline ? "bg-white" : bg ? bg : "bg-primary"}
+          ${outline ? "border-black" : bg ? bg : "bg-primary"}
           ${outline ? "text-black" : "text-white"}
           ${small ? "text-sm" : "text-md"}
           ${small ? "py-1" : "py-3"}
           ${small ? "font-light" : "font-semibold"}
           ${small ? "border-[1px]" : "border-2"}
+          ${text ? `text-[${text}]` : "text-white"}
         `}
     >
       {Icon && (
