@@ -80,7 +80,7 @@ async function run() {
       const user = await req.body;
       console.log("I need a new jwt", user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "5h",
       });
       res
         .cookie("TTToken", token, {
@@ -219,35 +219,130 @@ async function run() {
     });
     //! Payment Success
     app.post("/payment-success/:tranId/:bookingId", async (req, res) => {
-      await paymentsCollection.insertOne({
-        TransactionId: req.params.tranId,
-        bookingId: req.params.bookingId,
-      });
-      const data = await bookingsCollection.updateOne(
-        { _id: new ObjectId(req.params.bookingId) },
-        {
-          $set: {
-            status: "paid",
-          },
-        }
-      );
-      if (data.modifiedCount > 0) {
-        res.redirect(process.env.CLIENT_LINK);
+      try {
+        await paymentsCollection.insertOne({
+          TransactionId: req.params.tranId,
+          bookingId: req.params.bookingId,
+        });
+        await bookingsCollection.updateOne(
+          { _id: new ObjectId(req.params.bookingId) },
+          {
+            $set: {
+              status: "paid",
+            },
+          }
+        );
+        //!
+        const data1 = await bookingsCollection
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(req.params.bookingId),
+              },
+            },
+            {
+              $addFields: {
+                userIdObj: {
+                  $convert: {
+                    input: "$userId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Users",
+                localField: "userIdObj",
+                foreignField: "_id",
+                as: "user",
+              },
+            },
+            {
+              $unwind: "$user",
+            },
+            {
+              $addFields: {
+                roomIdObj: {
+                  $convert: {
+                    input: "$roomId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Rooms",
+                localField: "roomIdObj",
+                foreignField: "_id",
+                as: "room",
+              },
+            },
+            {
+              $unwind: "$room",
+            },
+          ])
+          .toArray();
+        //!
+        const sslcz = new ssl(
+          process.env.SSL_STORE_ID,
+          process.env.SSL_STORE_PASSWORD,
+          false
+        );
+        const data2 = await sslcz.transactionQueryByTransactionId({
+          tran_id: req.params.tranId,
+        });
+        //!
+        const mainData = {
+          tran_id: req.params.tranId,
+          name: data1[0].user.name,
+          email: data1[0].user.email,
+          roomName: data1[0].room.title,
+          checkIn: data1[0].startDate,
+          checkOut: data1[0].endDate,
+          price: data1[0].price,
+          tran_date: data2.element[0].tran_date,
+          card_type: data2.element[0].card_type,
+          bank_gw: data2.element[0].bank_gw,
+          val_id: data2.element[0].val_id,
+          status: data2.element[0].status,
+          currency_type: data2.element[0].currency_type,
+        };
+        const queryString = Object.keys(mainData)
+          .map(
+            (key) =>
+              `${encodeURIComponent(key)}=${encodeURIComponent(mainData[key])}`
+          )
+          .join("&");
+        res.redirect(
+          `${process.env.CLIENT_LINK}/payment-success/${req.params.tranId}?${queryString}`
+        );
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
       }
     });
     //! Get transaction Details
-    app.get("/transaction-query-by-transaction-id", (req, res) => {
-      const data = {
-        tran_id: "658ff5aed9a3063d7b9afc56",
+    app.get("/abc", (req, res) => {
+      //!----------
+      const additionalData = {
+        key1: "value1",
+        key2: "value2",
+        // Add more key-value pairs as needed
       };
-      const sslcz = new ssl(
-        process.env.SSL_STORE_ID,
-        process.env.SSL_STORE_PASSWORD,
-        false
-      );
-      sslcz.transactionQueryByTransactionId(data).then((data) => {
-        console.log(data);
-      });
+      const queryString = Object.keys(additionalData)
+        .map(
+          (key) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(
+              additionalData[key]
+            )}`
+        )
+        .join("&");
+      console.log(queryString);
+      // res.redirect(`${process.env.CLIENT_LINK}/payment-success/${req.params.tranId}?${queryString}`);
+
+      //!----------
     });
 
     // Send a ping to confirm a successful connection

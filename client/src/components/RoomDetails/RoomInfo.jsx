@@ -1,5 +1,5 @@
 import DatePicker from "react-date-picker";
-import { FaExclamationCircle } from "react-icons/fa";
+import { FaExclamationCircle, FaTimes } from "react-icons/fa";
 import { LuCalendarMinus, LuCalendarPlus } from "react-icons/lu";
 import Button from "../Button/Button";
 
@@ -83,7 +83,7 @@ const RoomInfo = ({
             onChange={selectEndDate}
             value={endDate}
             calendarIcon={<LuCalendarMinus className="text-2xl" />}
-            clearIcon={"X"}
+            clearIcon={<FaTimes />}
             dayPlaceholder="dd"
             monthPlaceholder="mm"
             yearPlaceholder="yyyy"

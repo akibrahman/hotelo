@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import PaymentSuccess from "../components/Shared/PaymentSuccess";
 import Main from "../layouts/Main";
 import DetailsPage from "../pages/DetailsPage/DetailsPage";
 import ErrorPage from "../pages/ErrorPage";
@@ -22,6 +23,14 @@ export const router = createBrowserRouter([
         element: (
           <UserPrivateRoute>
             <DetailsPage />
+          </UserPrivateRoute>
+        ),
+      },
+      {
+        path: "/payment-success/:tranId",
+        element: (
+          <UserPrivateRoute>
+            <PaymentSuccess />
           </UserPrivateRoute>
         ),
       },
