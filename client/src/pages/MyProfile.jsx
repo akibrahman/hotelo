@@ -1,3 +1,4 @@
+import { capitalizer } from "../API/capitalizer";
 import Loader from "../components/Shared/Loader";
 import useUser from "../hooks/useUser";
 
@@ -19,7 +20,7 @@ const MyProfile = () => {
         {/* User Information */}
         <div className="text-center mb-4">
           <h2 className="text-2xl font-semibold">{user.name}</h2>
-          <p className="text-gray-500">{user.role}</p>
+          <p className="text-gray-500">{capitalizer(user.role)}</p>
         </div>
 
         {/* Additional Details */}

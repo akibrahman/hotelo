@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import PaymentSuccess from "../components/Shared/PaymentSuccess";
 import Dashboard from "../layouts/Dashboard/Dashboard";
 import Main from "../layouts/Main";
+import AddRoom from "../pages/AddRoom";
 import DetailsPage from "../pages/DetailsPage/DetailsPage";
 import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
@@ -50,6 +51,12 @@ export const router = createBrowserRouter([
       </UserPrivateRoute>
     ),
     children: [
+      //! Admin
+      {
+        path: "add-room",
+        element: <AddRoom />,
+      },
+      //! User
       {
         path: "my-profile",
         element: <MyProfile />,
