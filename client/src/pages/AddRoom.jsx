@@ -1,6 +1,9 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { FaImage, FaTimes } from "react-icons/fa";
 import { base64 } from "../API/base64";
+import { makeFile } from "../API/makeFile";
+import { imageUpload } from "../API/util";
 import Button from "../components/Button/Button";
 
 const AddRoom = () => {
@@ -29,21 +32,34 @@ const AddRoom = () => {
     <div className="container mx-auto mt-8 w-[95%] p-5 border rounded-md">
       <h1 className="text-3xl font-bold mb-4">Add a Room</h1>
       <Button
-        onClick={() => {
+        onClick={async () => {
           if (!image) {
-            console.log("Main Image Missing");
+            toast.error("Main Image Missing");
             return;
           }
-          for (const i of images) {
-            if (!i) {
-              console.log("Additional Image(s) Missing");
+          for (const additionalImage of images) {
+            if (!additionalImage) {
+              toast.error("Additional Image(s) Missing");
               return;
             }
           }
-          console.log("Done");
-          console.log("1. ", image);
-          for (const i of images) {
-            console.log(images.indexOf(i) + ". ", i);
+          const mainImage = await imageUpload(
+            await makeFile(image, "mainImage.jpg", "image/jpg")
+          );
+          let additionalImages = [];
+          for (const additionalImage of images) {
+            const data = await imageUpload(
+              await makeFile(
+                additionalImage,
+                `additionalImage${images.indexOf(additionalImage)}.jpg`,
+                "image/jpg"
+              )
+            );
+            additionalImages.push(data);
+          }
+          console.log(mainImage);
+          for (const additionalImage of additionalImages) {
+            console.log(additionalImage);
           }
         }}
         label={"Test"}

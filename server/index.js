@@ -115,9 +115,16 @@ async function run() {
       const user = req.body;
       const query = { email: email };
       const options = { upsert: true };
-      // const isExist = await usersCollection.findOne(query);
-      // console.log("User found?----->", isExist);
-      // if (isExist) return res.send(isExist);
+      const isExist = await usersCollection.findOne(query);
+      if (isExist) {
+        await usersCollection.updateOne(query, {
+          $set: {
+            timestamp: Date.now(),
+          },
+        });
+        res.send(isExist);
+        return;
+      }
       const result = await usersCollection.updateOne(
         query,
         {
