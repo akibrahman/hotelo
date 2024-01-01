@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { FaRegStar, FaStar } from "react-icons/fa";
 import ReactModal from "react-modal";
+import Rating from "react-rating";
 import secureAxios from "../API/secureAxios";
 import Button from "../components/Button/Button";
 import Loader from "../components/Shared/Loader";
@@ -9,7 +12,8 @@ import useUser from "../hooks/useUser";
 const MyBookings = () => {
   const user = useUser();
   const [booking, setBooking] = useState(null);
-  const { data: bookings } = useQuery({
+  //! Get all Bookings
+  const { data: bookings, refetch: bookingsRefetch } = useQuery({
     queryKey: ["my-bookings", user?._id],
     queryFn: async ({ queryKey }) => {
       const res = await secureAxios.get(`/my-bookings/${queryKey[1]}`);
@@ -36,11 +40,34 @@ const MyBookings = () => {
     },
   };
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [rating, setRating] = useState(null);
+  const [comment, setComment] = useState(null);
   const openModal = () => {
     setModalIsOpen(true);
   };
   const closeModal = () => {
     setModalIsOpen(false);
+    setBooking(null);
+    setRating(null);
+    setComment(null);
+  };
+  const handleReview = async (event) => {
+    event.preventDefault();
+    if (!rating || !comment) {
+      toast.error("Please Review Properly !");
+      return;
+    }
+    const review = {
+      userId: user._id,
+      roomId: booking.roomId,
+      bookingId: booking._id,
+      comment,
+      rating,
+    };
+    await secureAxios.post("/post-review", review);
+    toast.success("Reviewed Successfully");
+    await bookingsRefetch();
+    closeModal();
   };
 
   if (!bookings) return <Loader />;
@@ -68,9 +95,7 @@ const MyBookings = () => {
 
           <div className="mx-auto p-6 bg-white rounded-md shadow-md shadow-primary w-full">
             <h2 className="text-2xl font-bold mb-4">Leave a Review</h2>
-            <form
-            //   onSubmit={handleSubmit}
-            >
+            <form onSubmit={handleReview}>
               <div className="mb-4">
                 <label
                   htmlFor="comment"
@@ -83,11 +108,18 @@ const MyBookings = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                   rows="4"
                   placeholder="Write your review here..."
-                  // value={comment}
-                  // onChange={(e) => setComment(e.target.value)}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
                 />
               </div>
-              <div className="mb-4"></div>
+              <div className="mb-4">
+                <Rating
+                  onClick={(val) => setRating(val)}
+                  initialRating={rating}
+                  fullSymbol={<FaStar className="text-2xl ml-1" />}
+                  emptySymbol={<FaRegStar className="text-2xl ml-1" />}
+                />
+              </div>
               <button
                 type="submit"
                 className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300"
@@ -103,7 +135,7 @@ const MyBookings = () => {
         {bookings.map((booking) => (
           <div
             key={booking._id}
-            className="bg-white p-6 pr-0 rounded-lg shadow-md shadow-primary flex gap-4 items-center"
+            className="bg-white p-6 rounded-lg shadow-md shadow-primary flex gap-4 items-center"
           >
             <div className="space-y-3">
               <img
@@ -111,7 +143,7 @@ const MyBookings = () => {
                 className="w-28 rounded-md"
                 alt="Room Image"
               />
-              {booking.enjoyed && (
+              {booking.enjoyed && !booking.reviewed ? (
                 <Button
                   onClick={async () => {
                     await bookingDetails(booking._id);
@@ -121,9 +153,20 @@ const MyBookings = () => {
                   small={true}
                   bg={"bg-green-400"}
                 />
-              )}
-              {booking.enjoyed || (
-                <Button label={"Cancle"} small={true} bg={"bg-red-400"} />
+              ) : booking.enjoyed && booking.reviewed ? (
+                <p className="text-center text-green-500 font-semibold">
+                  Reviewed
+                </p>
+              ) : (
+                <Button
+                  onClick={async () => {
+                    // await bookingDetails(booking._id);
+                    // openModal();
+                  }}
+                  label={"Cancle"}
+                  small={true}
+                  bg={"bg-red-400"}
+                />
               )}
             </div>
             <div className="space-y-2">

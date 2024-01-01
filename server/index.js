@@ -56,6 +56,7 @@ async function run() {
     const roomsCollection = client.db("StayVistaDB").collection("Rooms");
     const bookingsCollection = client.db("StayVistaDB").collection("Bookings");
     const paymentsCollection = client.db("StayVistaDB").collection("Payments");
+    const reviewsCollection = client.db("StayVistaDB").collection("Reviews");
     const testCollection = client.db("StayVistaDB").collection("Test");
 
     //!Test
@@ -174,6 +175,7 @@ async function run() {
           price: data.price,
           status: "due",
           enjoyed: false,
+          reviewed: false,
         });
         const bookingId = result.insertedId.toString();
         const tran_id = new ObjectId().toString();
@@ -443,6 +445,22 @@ async function run() {
           ])
           .toArray();
         res.send(booking);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
+    //! Post a Reeview
+    app.post("/post-review", async (req, res) => {
+      try {
+        const review = await req.body;
+        const result = await reviewsCollection.insertOne(review);
+        await bookingsCollection.updateOne(
+          { _id: new ObjectId(review.bookingId) },
+          { $set: { reviewed: true } }
+        );
+        res.send(result);
       } catch (error) {
         console.log(error);
         res.status(500).send({ message: "Internal Server Error" });
