@@ -10,7 +10,7 @@ const PaymentSuccess = () => {
     <div className="flex gap-4 w-[95%] mx-auto">
       <div className="w-1/2 flex flex-col gap-4">
         <div className="text-white">
-          <div className="text-center p-8 rounded-md shadow-md bg-purple-700">
+          <div className="text-center p-8 rounded-md shadow-md bg-primary text-white">
             <div className="flex items-center mb-4">
               <svg
                 className="h-8 w-8 mr-2"
@@ -33,13 +33,13 @@ const PaymentSuccess = () => {
             <div className="flex justify-center space-x-4">
               <Link
                 to={`${import.meta.env.VITE_client}/dashboard/my-bookings`}
-                className="bg-white text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 focus:outline-none focus:ring focus:border-purple-300"
+                className="bg-white text-primary px-4 py-2 rounded-full hover:bg-purple-200 focus:outline-none focus:ring focus:border-purple-300"
               >
                 See Bookings
               </Link>
               <Link
                 to={import.meta.env.VITE_client}
-                className="bg-white text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 focus:outline-none focus:ring focus:border-purple-300"
+                className="bg-white text-primary px-4 py-2 rounded-full hover:bg-purple-200 focus:outline-none focus:ring focus:border-purple-300"
               >
                 See Rooms
               </Link>

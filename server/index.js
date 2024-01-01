@@ -145,6 +145,16 @@ async function run() {
       }
     });
 
+    //! Add a Room
+    app.post("/add-room", verifyToken, async (req, res) => {
+      try {
+        const data = await roomsCollection.insertOne(await req.body);
+        res.send(data);
+      } catch (error) {
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
     //! Get all Rooms from Database
     app.get("/all-rooms", async (req, res) => {
       const query = {};

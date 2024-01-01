@@ -198,12 +198,6 @@ const DetailsPage = () => {
   if (!room || !reservations || !reservationData || !user) return <Loader />;
   return (
     <Container>
-      <Button
-        title="Test"
-        onClick={async () => {
-          await publicAxios.get("/transaction-query-by-transaction-id");
-        }}
-      />
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}

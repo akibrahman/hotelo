@@ -1,70 +1,87 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { FaImage, FaTimes } from "react-icons/fa";
+import { FaImage, FaSpinner, FaTimes } from "react-icons/fa";
 import { base64 } from "../API/base64";
 import { makeFile } from "../API/makeFile";
+import secureAxios from "../API/secureAxios";
 import { imageUpload } from "../API/util";
-import Button from "../components/Button/Button";
+import useUser from "../hooks/useUser";
 
 const AddRoom = () => {
+  const facility = useRef();
+  const user = useUser();
   const [fileKey, setFileKey] = useState(0);
   const [image, setImage] = useState("");
   const [images, setImages] = useState(["", "", "", "", ""]);
-  const [roomData, setRoomData] = useState({
-    title: "",
-    price: "",
-    category: "deluxe",
-    mainImage: "",
-    images: ["", "", "", "", ""],
-    description: "",
-    capacity: 1,
-  });
+  const [facilities, setFacilities] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setRoomData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!image) {
+      toast.error("Main Image Missing");
+      return;
+    }
+    for (const additionalImage of images) {
+      if (!additionalImage) {
+        toast.error("Additional Image(s) Missing");
+        return;
+      }
+    }
+    if (facilities.length == 0 || facilities.length < 2) {
+      toast.error("Add Atleast Two Features");
+      return;
+    }
+    setLoading(true);
+    try {
+      const mainImage = await imageUpload(
+        await makeFile(image, "mainImage.jpg", "image/*")
+      );
+      let additionalImages = [];
+      for (const additionalImage of images) {
+        const data = await imageUpload(
+          await makeFile(
+            additionalImage,
+            `additionalImage-${images.indexOf(additionalImage)}.jpg`,
+            "image/*"
+          )
+        );
+        additionalImages.push(data);
+      }
+      const room = {
+        title: e.target.title.value,
+        host: user._id,
+        price: e.target.price.value,
+        capacity: e.target.capacity.value,
+        description: e.target.description.value,
+        category: e.target.category.value,
+        image: mainImage,
+        gallery: additionalImages,
+        facilities,
+      };
+      setFacilities([]);
+      setImage("");
+      setFileKey(0);
+      setImages(["", "", "", "", ""]);
+      e.target.reset();
+      setLoading(false);
+      await secureAxios.post("/add-room", room);
+      toast.success("Room Added Successfully!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something Went Wrong!");
+    }
   };
 
   return (
     <div className="container mx-auto mt-8 w-[95%] p-5 border rounded-md">
       <h1 className="text-3xl font-bold mb-4">Add a Room</h1>
-      <Button
-        onClick={async () => {
-          if (!image) {
-            toast.error("Main Image Missing");
-            return;
-          }
-          for (const additionalImage of images) {
-            if (!additionalImage) {
-              toast.error("Additional Image(s) Missing");
-              return;
-            }
-          }
-          const mainImage = await imageUpload(
-            await makeFile(image, "mainImage.jpg", "image/jpg")
-          );
-          let additionalImages = [];
-          for (const additionalImage of images) {
-            const data = await imageUpload(
-              await makeFile(
-                additionalImage,
-                `additionalImage${images.indexOf(additionalImage)}.jpg`,
-                "image/jpg"
-              )
-            );
-            additionalImages.push(data);
-          }
-          console.log(mainImage);
-          for (const additionalImage of additionalImages) {
-            console.log(additionalImage);
-          }
-        }}
+      {/* <Button
+      
+        onClick={}
         label={"Test"}
-      />
-      <form>
+      /> */}
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
             htmlFor="title"
@@ -73,11 +90,9 @@ const AddRoom = () => {
             Title
           </label>
           <input
+            required
             type="text"
-            id="title"
             name="title"
-            value={roomData.title}
-            onChange={handleChange}
             className="mt-1 p-2 border w-full rounded-md outline-none"
           />
         </div>
@@ -90,14 +105,15 @@ const AddRoom = () => {
             >
               Price
             </label>
-            <input
-              type="text"
-              id="price"
-              name="price"
-              value={roomData.price}
-              onChange={handleChange}
-              className="mt-1 p-2 border w-full rounded-md outline-none"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                required
+                type="number"
+                name="price"
+                className="mt-1 p-2 border w-full rounded-md outline-none"
+              />
+              <label className="font-semibold text-primary">BDT</label>
+            </div>
           </div>
 
           <div className="mb-4 flex-1">
@@ -108,15 +124,16 @@ const AddRoom = () => {
               Category
             </label>
             <select
-              id="category"
+              required
               name="category"
-              value={roomData.category}
-              onChange={handleChange}
               className="mt-1 p-2 border w-full rounded-md"
             >
-              <option value="deluxe">Deluxe</option>
-              <option value="couple">Couple</option>
-              <option value="moderate">Moderate</option>
+              <option value="singleDeluxe">Single Deluxe</option>
+              <option value="singlePremium">Single Premium</option>
+              <option value="coupleDeluxe">Couple Deluxe</option>
+              <option value="couplePremium">Couple Premium</option>
+              <option value="family-4">Family - 4</option>
+              <option value="family-6">Family -6</option>
             </select>
           </div>
         </div>
@@ -135,7 +152,7 @@ const AddRoom = () => {
               const data = await base64(file.target);
               setImage(data);
             }}
-            className="hidden"
+            className="scale-0 absolute"
           />
           {image ? (
             <div className="w-32 h-20 relative">
@@ -162,7 +179,7 @@ const AddRoom = () => {
           )}
         </div>
 
-        <div className="mb-4">
+        <div className="mb-6">
           <label className="block text-sm font-medium text-gray-600 mb-4">
             Additional Images
           </label>
@@ -196,7 +213,9 @@ const AddRoom = () => {
                 )}
                 <input
                   id={`additionalImage${index}`}
+                  name={`additionalImage${index}`}
                   type="file"
+                  accept="image/*"
                   key={fileKey}
                   onChange={async (file) => {
                     const data = await base64(file.target);
@@ -204,7 +223,7 @@ const AddRoom = () => {
                     temp[index] = data;
                     setImages(temp);
                   }}
-                  className="hidden"
+                  className="scale-0 absolute"
                 />
               </div>
             ))}
@@ -216,13 +235,55 @@ const AddRoom = () => {
             htmlFor="description"
             className="block text-sm font-medium text-gray-600"
           >
+            Facilities
+          </label>
+          <div className="p-4 bg-slate-200 rounded-md mt-2 flex items-center flex-wrap gap-3">
+            {facilities.map((fa, i) => (
+              <span
+                className="bg-primary px-3 py-1 rounded-md text-white flex items-center gap-2"
+                key={fa + i}
+              >
+                {i + 1}: {fa}
+                <FaTimes
+                  onClick={() => {
+                    const temp = [...facilities];
+                    temp.splice(i, 1);
+                    setFacilities(temp);
+                  }}
+                  className="text-xl bg-white text-primary rounded-full p-1 cursor-pointer"
+                />
+              </span>
+            ))}
+          </div>
+          <input
+            type="text"
+            className="border rounded-md mt-2 px-3 py-1 outline-none"
+            placeholder="Write Facility"
+            ref={facility}
+          />
+          <p
+            onClick={() => {
+              if (!facility.current.value) return;
+              const temp = [...facilities];
+              temp.push(facility.current.value);
+              facility.current.value = "";
+              setFacilities(temp);
+            }}
+            className="bg-primary text-white px-3 py-1 font-semibold rounded-md ml-2 duration-300 active:scale-90 ease-in-out cursor-pointer select-none w-max inline-block"
+          >
+            Add
+          </p>
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-600"
+          >
             Description
           </label>
           <textarea
-            id="description"
+            required
             name="description"
-            value={roomData.description}
-            onChange={handleChange}
             className="mt-1 p-2 border w-full rounded-md outline-none"
           />
         </div>
@@ -235,20 +296,18 @@ const AddRoom = () => {
             Capacity
           </label>
           <input
+            required
             type="number"
-            id="capacity"
             name="capacity"
-            value={roomData.capacity}
-            onChange={handleChange}
             className="mt-1 p-2 border w-full rounded-md outline-none"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          className="bg-primary text-white px-4 py-2 rounded-md flex items-center gap-3"
         >
-          Add Room
+          Add Room {loading && <FaSpinner className="animate-spin" />}
         </button>
       </form>
     </div>

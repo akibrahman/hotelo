@@ -34,7 +34,7 @@ const Card = ({ room }) => {
         </div>
         <div className="font-semibold text-lg">{room?.title}</div>
         <div className="flex flex-row items-center gap-1">
-          <div className="font-semibold">$ {room?.price}</div>
+          <div className="font-semibold">BDT {room?.price}</div>
           <div className="font-light">night</div>
         </div>
       </div>
