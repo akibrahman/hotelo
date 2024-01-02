@@ -15,6 +15,7 @@ secureAxios.interceptors.response.use(
       (error.response.status === 401 || error.response.status === 403)
     ) {
       await removeToken();
+      console.log("Coming Bad");
       window.location.replace("/login");
     }
     return Promise.reject(error);

@@ -58,6 +58,10 @@ const MyPayments = () => {
   const closeModal2 = () => {
     setModalIsOpen2(false);
   };
+
+  const download = () => {
+    console.log("Ok");
+  };
   if (!user || !payments) return <Loader />;
 
   return (
@@ -107,67 +111,69 @@ const MyPayments = () => {
         style={customStyles}
       >
         <div className="p-8 border border-primary rounded-lg">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-semibold">Invoice</h1>
-          </div>
-
-          <div className="flex items-center gap-10 mb-6">
-            <div className="text-center">
-              <p className="font-semibold">From:</p>
-              <p>Hotelo</p>
-              <p>123 Main Street</p>
-              <p>Uttara, Dhaka, 1230</p>
-              <p>Email: hotelo@email.com</p>
+          <div className="main-invoice">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl font-semibold">Invoice</h1>
             </div>
 
-            <div className="text-center">
-              <p className="font-semibold">To:</p>
-              <p>{user.name}</p>
-              <p>456 Client Street</p>
-              <p>Uttara, Dhaka, 1230</p>
-              <p>Email: {user.email}</p>
+            <div className="flex items-center gap-10 mb-6">
+              <div className="text-center">
+                <p className="font-semibold">From:</p>
+                <p>Hotelo</p>
+                <p>123 Main Street</p>
+                <p>Uttara, Dhaka, 1230</p>
+                <p>Email: hotelo@email.com</p>
+              </div>
+
+              <div className="text-center">
+                <p className="font-semibold">To:</p>
+                <p>{user.name}</p>
+                <p>456 Client Street</p>
+                <p>Uttara, Dhaka, 1230</p>
+                <p>Email: {user.email}</p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex justify-end mb-4">
-            <p className="font-semibold">Total:</p>
-            {/* <p className="ml-2">${amount}</p> */}
-            <p className="ml-2">{payment?.amount} BDT</p>
-          </div>
+            <div className="flex justify-end mb-4">
+              <p className="font-semibold">Total:</p>
+              {/* <p className="ml-2">${amount}</p> */}
+              <p className="ml-2">{payment?.amount} BDT</p>
+            </div>
 
-          <div>
-            <p className="font-black text-center mb-3 text-lg underline">
-              Payment Details
-            </p>
-            <p>
-              <strong>Transaction ID:</strong> {payment?.tran_id}
-            </p>
-            <p>
-              <strong>Transaction Date:</strong> {payment?.tran_date}
-            </p>
-            <p>
-              <strong>Card Type:</strong> {payment?.card_type}
-            </p>
-            <p>
-              <strong>Bank Gateway:</strong> {payment?.bank_gw}
-            </p>
-            <p>
-              <strong>Validation ID:</strong> {payment?.val_id}
-            </p>
-            <p>
-              <strong>Status:</strong> {payment?.status}
-            </p>
-            <p>
-              <strong>Currency Type:</strong> {payment?.currency_type}
-            </p>
-          </div>
+            <div>
+              <p className="font-black text-center mb-3 text-lg underline">
+                Payment Details
+              </p>
+              <p>
+                <strong>Transaction ID:</strong> {payment?.tran_id}
+              </p>
+              <p>
+                <strong>Transaction Date:</strong> {payment?.tran_date}
+              </p>
+              <p>
+                <strong>Card Type:</strong> {payment?.card_type}
+              </p>
+              <p>
+                <strong>Bank Gateway:</strong> {payment?.bank_gw}
+              </p>
+              <p>
+                <strong>Validation ID:</strong> {payment?.val_id}
+              </p>
+              <p>
+                <strong>Status:</strong> {payment?.status}
+              </p>
+              <p>
+                <strong>Currency Type:</strong> {payment?.currency_type}
+              </p>
+            </div>
 
-          <div className="flex gap-2">
-            <p className="font-semibold">Notes:</p>
-            <span>Thank you for choosing us!</span>
+            <div className="flex gap-2">
+              <p className="font-semibold">Notes:</p>
+              <span>Thank you for choosing us!</span>
+            </div>
           </div>
           <div className="mt-4 grid grid-cols-4">
-            <Button label={"Download"} small={true} />
+            <Button onClick={download} label={"Download"} small={true} />
           </div>
         </div>
       </Modal>

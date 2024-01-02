@@ -86,8 +86,8 @@ async function run() {
       res
         .cookie("TTToken", token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          secure: true,
+          sameSite: "none",
         })
         .send({ success: true });
     });
@@ -152,6 +152,32 @@ async function run() {
         res.send(data);
       } catch (error) {
         res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
+    //! Edit a Room - Admin
+    app.put("/edit-room/:id", verifyToken, async (req, res) => {
+      try {
+        const room = await req.body;
+        const id = req.params.id;
+        console.log(room, id);
+        const query = { _id: new ObjectId(id) };
+        const data = await roomsCollection.updateOne(query, {
+          $set: {
+            title: room.title,
+            host: room.host,
+            price: room.price,
+            capacity: room.capacity,
+            description: room.description,
+            category: room.category,
+            image: room.image,
+            gallery: room.gallery,
+            facilities: room.facilities,
+          },
+        });
+        res.send(data);
+      } catch (error) {
+        res.status(501).send({ message: "Internal Server Error" });
       }
     });
 
@@ -485,25 +511,24 @@ async function run() {
     });
 
     //! Cron Schedule
-    cron.schedule("0 0 * * *", async () => {
-      console.log("Started");
-      const bookings = await bookingsCollection.find({}).toArray();
-      for (const booking of bookings) {
-        //!
-        const thatDat = new Date(booking.startDate);
-        const today = new Date();
-        if (
-          thatDat.getFullYear() === today.getFullYear() &&
-          thatDat.getMonth() === today.getMonth() &&
-          thatDat.getDate() === today.getDate()
-        ) {
-          await bookingsCollection.updateOne(
-            { _id: new ObjectId(booking._id) },
-            { $set: { enjoyed: true } }
-          );
-        }
-      }
-    });
+    // cron.schedule("0 0 * * *", async () => {
+    //   console.log("Started");
+    //   const bookings = await bookingsCollection.find({}).toArray();
+    //   for (const booking of bookings) {
+    //     const thatDat = new Date(booking.startDate);
+    //     const today = new Date();
+    //     if (
+    //       thatDat.getFullYear() === today.getFullYear() &&
+    //       thatDat.getMonth() === today.getMonth() &&
+    //       thatDat.getDate() === today.getDate()
+    //     ) {
+    //       await bookingsCollection.updateOne(
+    //         { _id: new ObjectId(booking._id) },
+    //         { $set: { enjoyed: true } }
+    //       );
+    //     }
+    //   }
+    // });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();

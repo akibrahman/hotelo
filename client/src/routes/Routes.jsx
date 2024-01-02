@@ -3,7 +3,9 @@ import PaymentSuccess from "../components/Shared/PaymentSuccess";
 import Dashboard from "../layouts/Dashboard/Dashboard";
 import Main from "../layouts/Main";
 import AddRoom from "../pages/AddRoom";
+import AllRooms from "../pages/AllRooms";
 import DetailsPage from "../pages/DetailsPage/DetailsPage";
+import EditRoom from "../pages/EditRoom";
 import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
@@ -55,6 +57,14 @@ export const router = createBrowserRouter([
       {
         path: "add-room",
         element: <AddRoom />,
+      },
+      {
+        path: "all-rooms",
+        element: <AllRooms />,
+      },
+      {
+        path: "edit-room/:id",
+        element: <EditRoom />,
       },
       //! User
       {
