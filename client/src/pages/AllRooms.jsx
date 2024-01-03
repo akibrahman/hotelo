@@ -40,7 +40,9 @@ const AllRooms = () => {
                 <HiPencil className="text-white bg-primary rounded-full p-1 text-3xl cursor-pointer hover:bg-blue-600 duration-300 select-none active:scale-90" />
               </Link>
               <MdDelete className="text-white bg-primary rounded-full p-1 text-3xl cursor-pointer hover:bg-blue-600 duration-300 select-none active:scale-90" />
-              <FaArrowRight className="text-white bg-primary rounded-full p-1 text-3xl cursor-pointer hover:bg-blue-600 duration-300 select-none active:scale-90" />
+              <Link to={`/room/${room._id}`}>
+                <FaArrowRight className="text-white bg-primary rounded-full p-1 text-3xl cursor-pointer hover:bg-blue-600 duration-300 select-none active:scale-90" />
+              </Link>
             </div>
           </div>
         ))}

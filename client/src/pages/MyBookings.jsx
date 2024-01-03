@@ -79,7 +79,7 @@ const MyBookings = () => {
         onRequestClose={closeModal}
         style={customStyles}
       >
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 min-w-[500px]">
           <div className="bg-white p-6 rounded-lg shadow-md shadow-primary flex gap-4 items-center w-full">
             <div className="space-y-3">
               <img

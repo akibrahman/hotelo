@@ -52,12 +52,15 @@ const RoomInfo = ({
       </div>
 
       <hr /> */}
-      <div
-        className="
+      {roomData.description.split("&--&").map((description, i) => (
+        <div
+          key={i}
+          className="
           text-lg font-light text-neutral-500 text-justify"
-      >
-        {roomData.description}
-      </div>
+        >
+          {description}
+        </div>
+      ))}
       <hr />
       <div className="flex items-center gap-6">
         <div className="w-1/2 ">

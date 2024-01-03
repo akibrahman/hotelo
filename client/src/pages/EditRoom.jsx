@@ -304,11 +304,17 @@ const EditRoom = () => {
             htmlFor="description"
             className="block text-sm font-medium text-gray-600"
           >
-            Description
+            Description{" "}
+            <span className="ml-20">
+              ( Put{" "}
+              <span className="bg-slate-300 px-3 rounded-md mx-1">&--&</span> to
+              make Paragraph )
+            </span>
           </label>
           <textarea
             defaultValue={room.description}
             required
+            rows="6"
             name="description"
             className="mt-1 p-2 border w-full rounded-md outline-none"
           />
@@ -334,7 +340,7 @@ const EditRoom = () => {
           type="submit"
           className="bg-primary text-white px-4 py-2 rounded-md flex items-center gap-3"
         >
-          Add Room {loading && <FaSpinner className="animate-spin" />}
+          Update Room {loading && <FaSpinner className="animate-spin" />}
         </button>
       </form>
     </div>

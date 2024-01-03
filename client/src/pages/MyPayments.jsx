@@ -192,7 +192,7 @@ const MyPayments = () => {
               {new Date(payment.paymentDate).toDateString()}
             </p>
             <p className="text-green-600 font-semibold mt-2">
-              ${payment.amount}
+              BDT: {payment.amount}/-
             </p>
             <div className="flex gap-3 mt-3">
               <Button
