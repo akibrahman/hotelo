@@ -19,7 +19,7 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
-  const url = location.state.from.pathname || "/";
+  const url = location?.state?.from?.pathname || "/";
 
   const handleSubmit = async (event) => {
     setLoading(true);
@@ -32,10 +32,11 @@ const SignUp = () => {
 
     try {
       const imageData = await imageUpload(image);
+      console.log(imageData);
 
       const result = await createUser(email, password);
 
-      await updateUserProfile(name, imageData.display_url);
+      await updateUserProfile(name, imageData);
 
       await saveUser(result?.user);
 

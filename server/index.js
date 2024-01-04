@@ -52,28 +52,20 @@ const client = new MongoClient(process.env.DB_URI, {
 async function run() {
   try {
     //! Collections
-    const usersCollection = client.db("StayVistaDB").collection("Users");
-    const roomsCollection = client.db("StayVistaDB").collection("Rooms");
-    const bookingsCollection = client.db("StayVistaDB").collection("Bookings");
-    const paymentsCollection = client.db("StayVistaDB").collection("Payments");
-    const reviewsCollection = client.db("StayVistaDB").collection("Reviews");
-    const testCollection = client.db("StayVistaDB").collection("Test");
+    const dataBase = client.db("HoteloDB");
+    const usersCollection = dataBase.collection("Users");
+    const roomsCollection = dataBase.collection("Rooms");
+    const bookingsCollection = dataBase.collection("Bookings");
+    const paymentsCollection = dataBase.collection("Payments");
+    const reviewsCollection = dataBase.collection("Reviews");
 
     //!Test
-    // cron.schedule("23 21 * * *", async () => {
-    //   const users = await usersCollection.find({}).toArray();
-    //   for (const user of users) {
-    //     await testCollection.insertOne({ reason: "test", data: user });
+    // app.post("/boooooom", async () => {
+    //   const as = await reviewsCollection.find({}).toArray();
+    //   for (const a of as) {
+    //     await newreviewsCollection.insertOne(a);
     //   }
     //   console.log("A Big Done");
-    // });
-    // cron.schedule("*/10 * * * * *", async () => {
-    //   const date = await testCollection.find().toArray();
-    //   console.log(new Date(date[0].date).getDate());
-    // });
-
-    // app.post("/dateTest", async (req, res) => {
-    //   await testCollection.insertOne(await req.body);
     // });
 
     //! Create Token by JWT
@@ -112,13 +104,15 @@ async function run() {
     //! Save or modify user email, status in DB
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
-      const user = req.body;
+      const user = await req.body;
       const query = { email: email };
       const options = { upsert: true };
       const isExist = await usersCollection.findOne(query);
       if (isExist) {
         await usersCollection.updateOne(query, {
           $set: {
+            name: user.name,
+            photo: user.photo,
             timestamp: Date.now(),
           },
         });
@@ -530,8 +524,6 @@ async function run() {
     //   }
     // });
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
   }
 }
 run().catch(console.dir);
