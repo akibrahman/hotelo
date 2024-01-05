@@ -1,10 +1,10 @@
 import { DateRange } from "react-date-range";
 
-const Calender = ({ value, handleSelect, reservations }) => {
+const Calender = ({ value, reservations }) => {
   return (
     <DateRange
       ranges={[value, ...reservations]}
-      onChange={handleSelect}
+      // onChange={handleSelect}
       direction="vertical"
       showDateDisplay={false}
     />

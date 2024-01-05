@@ -55,3 +55,10 @@ body {
   border-radius: 10px;
   font-weight: bold;
 }
+.rdrMonths.rdrMonthsVertical {
+  pointer-events: none;
+}
+.likeBtn {
+  filter: invert(18%) sepia(15%) saturate(3%) hue-rotate(75deg) brightness(96%)
+    contrast(82%);
+}

@@ -35,7 +35,8 @@
     "react-rating": "^2.0.5",
     "react-router-dom": "^6.19.0",
     "react-spinners": "^0.13.8",
-    "sort-by": "^1.2.0"
+    "sort-by": "^1.2.0",
+    "swiper": "^11.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

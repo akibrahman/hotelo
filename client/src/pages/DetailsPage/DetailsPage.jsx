@@ -2,8 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { FaRegStar, FaStar } from "react-icons/fa";
 import Modal from "react-modal";
+import Rating from "react-rating";
 import { useParams } from "react-router-dom";
+import { Autoplay, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import publicAxios from "../../API/publicAxios";
 import Button from "../../components/Button/Button";
 import RoomInfo from "../../components/RoomDetails/RoomInfo";
@@ -11,6 +15,7 @@ import RoomReservation from "../../components/RoomDetails/RoomReservation";
 import Container from "../../components/Shared/Container";
 import Heading from "../../components/Shared/Heading";
 import Loader from "../../components/Shared/Loader";
+import SliderBtn from "../../components/SliderBtn";
 import useUser from "../../hooks/useUser";
 
 const DetailsPage = () => {
@@ -47,6 +52,8 @@ const DetailsPage = () => {
       return res.data;
     },
   });
+  //! Getting all Reviews
+  const reviews = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
   //! Getting all reservationsData for this room
   const { data: reservationData, refetch: reservationDataRefetch } = useQuery({
     queryKey: ["reservations", id],
@@ -152,7 +159,7 @@ const DetailsPage = () => {
       startDate: moment(startDate)._d,
       endDate: moment(endDate)._d,
       key: "current",
-      color: "",
+      color: "green",
     });
     console.log(startDate);
     console.log(endDate);
@@ -168,14 +175,6 @@ const DetailsPage = () => {
   };
   //! Add Bookings
   const addBookings = async () => {
-    // const data = {
-    //   userId: user._id,
-    //   roomId: id,
-    //   startDate,
-    //   endDate,
-    //   price: totalPrice,
-    // };
-    // console.log(data);
     const res = await publicAxios.post("/add-bookings", {
       userId: user._id,
       roomId: id,
@@ -242,15 +241,40 @@ const DetailsPage = () => {
           </div>
         </div>
       </Modal>
-      <div className="max-w-screen-lg mx-auto">
+      <div className="max-w-screen-lg mx-auto select-none pb-10">
         <div className="flex flex-col gap-6">
-          {/* <Header roomData={room} /> */}
           <Heading title={room.title} />
-          <img
-            src={room.image}
-            className="w-full h-[420px] rounded-md"
-            alt=""
-          />
+          <Swiper
+            modules={[Pagination, Autoplay]}
+            pagination={true}
+            loop={true}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+            }}
+            className="w-full"
+          >
+            <SwiperSlide>
+              <img
+                src={room.image}
+                className="h-[420px] rounded-md w-full"
+                alt=""
+              />
+            </SwiperSlide>
+            {room.gallery.map((image, i) => (
+              <SwiperSlide key={i}>
+                <img
+                  src={image}
+                  className="w-full h-[420px] rounded-md"
+                  alt=""
+                />
+              </SwiperSlide>
+            ))}
+            <div className="w-full px-2 absolute z-10 top-1/2 -translate-y-1/2 left-0 flex items-center justify-between select-none">
+              <SliderBtn dir="prev"></SliderBtn>
+              <SliderBtn dir="next"></SliderBtn>
+            </div>
+          </Swiper>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-7 gap-6 mt-10">
           <RoomInfo
@@ -284,6 +308,39 @@ const DetailsPage = () => {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+        <div className="">
+          <p className="font-semibold mb-8 text-neutral-500 text-lg">
+            Reviews:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {reviews.map((a, i) => (
+              <div
+                className="flex flex-col gap-3 bg-stone-200 p-5 rounded-lg"
+                key={a + i}
+              >
+                <div className="flex items-center gap-3">
+                  <img
+                    src="https://i.ibb.co/3YzPkht/Linkdin1.jpg"
+                    className="w-10 h-10 rounded-full"
+                    alt=""
+                  />
+                  <p>Akib Rahman</p>
+                  <Rating
+                    // onClick={(val) => setRating(val)}
+                    initialRating={"4.6"}
+                    fullSymbol={<FaStar className="ml-1 mt-2" />}
+                    emptySymbol={<FaRegStar className="ml-1 mt-2" />}
+                  />
+                </div>
+                <p>
+                  Couple Kingdom room exceeded expectations! The romantic
+                  ambiance, thoughtful decor, and cozy atmosphere create an
+                  unforgettable retreat. Perfect for a romantic getaway!
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

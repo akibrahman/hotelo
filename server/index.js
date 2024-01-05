@@ -62,10 +62,12 @@ async function run() {
 
     //!Test
     // app.post("/boooooom", async () => {
-    //   const as = await reviewsCollection.find({}).toArray();
-    //   for (const a of as) {
-    //     await newreviewsCollection.insertOne(a);
-    //   }
+    //   (await roomsCollection.find().toArray()).map(async (user) => {
+    //     await roomsCollection.updateOne(
+    //       { _id: user._id },
+    //       { $set: { likes: 0 } }
+    //     );
+    //   });
     //   console.log("A Big Done");
     // });
 
@@ -198,6 +200,30 @@ async function run() {
         .find({ roomId: id })
         .toArray();
       res.send(reservations);
+    });
+
+    //! Like
+    app.post("/like/:roomId/:userId", verifyToken, async (req, res) => {
+      const roomId = req.params.roomId;
+      const userId = req.params.userId;
+      const query = { _id: new ObjectId(roomId) };
+      const query2 = { _id: new ObjectId(userId) };
+      await roomsCollection.updateOne(query, {
+        $inc: { likes: 1 },
+      });
+      await usersCollection.updateOne(query2, { $push: { likings: roomId } });
+    });
+
+    //! DisLike
+    app.post("/dislike/:roomId/:userId", verifyToken, async (req, res) => {
+      const roomId = req.params.roomId;
+      const userId = req.params.userId;
+      const query = { _id: new ObjectId(roomId) };
+      const query2 = { _id: new ObjectId(userId) };
+      await roomsCollection.updateOne(query, {
+        $inc: { likes: -1 },
+      });
+      await usersCollection.updateOne(query2, { $pull: { likings: roomId } });
     });
 
     //! Make Bookings
