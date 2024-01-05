@@ -14,8 +14,9 @@ const port = process.env.PORT || 8000;
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://stay-vista-akib.web.app",
-    "https://stay-vista-akib.firebaseapp.com",
+    "https://hotelooo.web.app",
+    "https://hotelooo.firebaseapp.com",
+    "https://facebook.com",
   ],
   credentials: true,
   optionSuccessStatus: 200,

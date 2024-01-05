@@ -2,7 +2,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineMenu } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import publicAxios from "../../../API/publicAxios";
 import avatarImg from "../../../assets/images/placeholder.jpg";
 import useAuth from "../../../hooks/useAuth";
 
@@ -21,9 +20,9 @@ const MenuDropdown = () => {
         {/* Become A Host btn */}
         <div className="hidden md:block">
           <button
-            onClick={async () => {
-              await publicAxios.post("/boooooom");
-            }}
+            // onClick={async () => {
+            //   await publicAxios.post("/boooooom");
+            // }}
             className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
           >
             Host your home

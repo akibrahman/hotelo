@@ -6,10 +6,10 @@ import Modal from "react-modal";
 import { useParams } from "react-router-dom";
 import publicAxios from "../../API/publicAxios";
 import Button from "../../components/Button/Button";
-import Header from "../../components/RoomDetails/Header";
 import RoomInfo from "../../components/RoomDetails/RoomInfo";
 import RoomReservation from "../../components/RoomDetails/RoomReservation";
 import Container from "../../components/Shared/Container";
+import Heading from "../../components/Shared/Heading";
 import Loader from "../../components/Shared/Loader";
 import useUser from "../../hooks/useUser";
 
@@ -60,7 +60,7 @@ const DetailsPage = () => {
     key: _id,
     startDate: moment(startDate)._d,
     endDate: moment(endDate)._d,
-    color: "#9447D6",
+    color: "#3B82F6",
   }));
   //! Selecting Check In Date
   const selectStartDate = (data) => {
@@ -244,7 +244,13 @@ const DetailsPage = () => {
       </Modal>
       <div className="max-w-screen-lg mx-auto">
         <div className="flex flex-col gap-6">
-          <Header roomData={room} />
+          {/* <Header roomData={room} /> */}
+          <Heading title={room.title} />
+          <img
+            src={room.image}
+            className="w-full h-[420px] rounded-md"
+            alt=""
+          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-7 gap-6 mt-10">
           <RoomInfo
@@ -264,6 +270,20 @@ const DetailsPage = () => {
               room={room}
               totalPrice={totalPrice}
             />
+            <div className="text-xl my-8 text-neutral-500">
+              <p className="font-semibold mb-3">Special Features:</p>
+              <div className="flex flex-col gap-2">
+                {room.facilities.map((facility, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 bg-primary text-white px-3 py-1 rounded-md"
+                  >
+                    <p>{i + 1}.</p>
+                    <p>{facility}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
