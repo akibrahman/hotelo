@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import publicAxios from "../../API/publicAxios";
+import secureAxios from "../../API/secureAxios";
 import Button from "../../components/Button/Button";
 import RoomInfo from "../../components/RoomDetails/RoomInfo";
 import RoomReservation from "../../components/RoomDetails/RoomReservation";
@@ -53,7 +54,13 @@ const DetailsPage = () => {
     },
   });
   //! Getting all Reviews
-  const reviews = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+  const { data: reviews } = useQuery({
+    queryKey: ["reviews", room?._id],
+    queryFn: async ({ queryKey }) => {
+      const { data } = await secureAxios.get(`/reviews/${queryKey[1]}`);
+      return data;
+    },
+  });
   //! Getting all reservationsData for this room
   const { data: reservationData, refetch: reservationDataRefetch } = useQuery({
     queryKey: ["reservations", id],
@@ -194,7 +201,8 @@ const DetailsPage = () => {
     closeModal();
     toast.success("Processing....");
   };
-  if (!room || !reservations || !reservationData || !user) return <Loader />;
+  if (!room || !reservations || !reservationData || !user || !reviews)
+    return <Loader />;
   return (
     <Container>
       <Modal
@@ -315,30 +323,26 @@ const DetailsPage = () => {
             Reviews:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {reviews.map((a, i) => (
+            {reviews.map((review) => (
               <div
                 className="flex flex-col gap-3 bg-stone-200 p-5 rounded-lg"
-                key={a + i}
+                key={review._id}
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src="https://i.ibb.co/3YzPkht/Linkdin1.jpg"
+                    src={review.user.photo}
                     className="w-10 h-10 rounded-full"
-                    alt=""
+                    alt={review.user.name}
                   />
-                  <p>Akib Rahman</p>
+                  <p>{review.user.name}</p>
                   <Rating
-                    // onClick={(val) => setRating(val)}
-                    initialRating={"4.6"}
+                    readonly={true}
+                    initialRating={review.rating}
                     fullSymbol={<FaStar className="ml-1 mt-2" />}
                     emptySymbol={<FaRegStar className="ml-1 mt-2" />}
                   />
                 </div>
-                <p>
-                  Couple Kingdom room exceeded expectations! The romantic
-                  ambiance, thoughtful decor, and cozy atmosphere create an
-                  unforgettable retreat. Perfect for a romantic getaway!
-                </p>
+                <p>{review.comment}</p>
               </div>
             ))}
           </div>

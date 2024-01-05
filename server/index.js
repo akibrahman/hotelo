@@ -515,7 +515,7 @@ async function run() {
       }
     });
 
-    //! Post a Reeview
+    //! Post a Review
     app.post("/post-review", async (req, res) => {
       try {
         const review = await req.body;
@@ -529,6 +529,42 @@ async function run() {
         console.log(error);
         res.status(500).send({ message: "Internal Server Error" });
       }
+    });
+
+    //! Get Reviews
+    app.get("/reviews/:roomId", verifyToken, async (req, res) => {
+      const roomId = req.params.roomId;
+      const reviews = await reviewsCollection
+        .aggregate([
+          {
+            $match: {
+              roomId,
+            },
+          },
+          {
+            $addFields: {
+              userIdObj: {
+                $convert: {
+                  input: "$userId",
+                  to: "objectId",
+                },
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "Users",
+              localField: "userIdObj",
+              foreignField: "_id",
+              as: "user",
+            },
+          },
+          {
+            $unwind: "$user",
+          },
+        ])
+        .toArray();
+      res.send(reviews);
     });
 
     //! Cron Schedule
