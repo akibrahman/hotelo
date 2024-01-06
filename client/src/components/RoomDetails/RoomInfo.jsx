@@ -62,7 +62,7 @@ const RoomInfo = ({
           <div
             key={i}
             className="
-          text-lg font-light text-neutral-500 text-justify"
+          text-lg font-light text-neutral-500 text-justify mt-3"
           >
             {description}
           </div>

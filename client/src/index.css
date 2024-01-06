@@ -18,15 +18,16 @@ body {
   transform: translateX(-50%);
   bottom: 0;
   width: 0;
-  height: 3px;
-  background: #000;
+  height: 2px;
+  border-radius: 10px;
+  background: #3b82f6;
   transition: all 0.25s linear;
 }
 .menulink p:hover::before {
-  width: 100%;
+  width: 110%;
 }
 .active p::before {
-  width: 100%;
+  width: 110%;
 }
 
 .react-calendar {

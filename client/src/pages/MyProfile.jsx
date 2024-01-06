@@ -1,9 +1,17 @@
+import toast from "react-hot-toast";
 import { capitalizer } from "../API/capitalizer";
 import Loader from "../components/Shared/Loader";
+import useAuth from "../hooks/useAuth";
 import useUser from "../hooks/useUser";
 
 const MyProfile = () => {
   const user = useUser();
+  const { logOut } = useAuth();
+
+  const handleLogOut = async () => {
+    await logOut();
+    toast.success("Successfully Logged Out");
+  };
   if (!user) return <Loader />;
   return (
     <div className="flex justify-center items-center w-[95%] mx-auto bg-gray-100 py-20">
@@ -38,6 +46,21 @@ const MyProfile = () => {
             <span>{user.address}</span>
           </div>
           {/* Add more details as needed */}
+          <div className="flex items-center justify-center gap-10">
+            <button
+              className="bg-orange-500 rounded-md px-4 py-2 texmedi
+             text-white duration-300 active:scale-90"
+            >
+              Edit
+            </button>
+            <button
+              onClick={handleLogOut}
+              className="bg-red-500 rounded-md px-4 py-2 texmedi
+             text-white duration-300 active:scale-90"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>

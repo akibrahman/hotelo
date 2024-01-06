@@ -13,7 +13,6 @@ const MenuDropdown = () => {
     await logOut();
     toast.success("Successfully Logged Out");
   };
-  if (!user) return;
   return (
     <div className="relative">
       <div className="flex items-center gap-10">
@@ -36,22 +35,33 @@ const MenuDropdown = () => {
           </NavLink>
         </div>
         {/* Profile  */}
-        <div
-          onClick={() => setIsOpen(!isOpen)}
-          className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer md:cursor-default hover:shadow-md transition"
-        >
-          <AiOutlineMenu className="block md:hidden" />
-          <div className="hidden md:flex items-center gap-3 px-2 py-1">
-            {/* Avatar */}
-            <img
-              className="rounded-full w-8 h-8"
-              referrerPolicy="no-referrer"
-              src={user && user.photoURL ? user.photoURL : avatarImg}
-              alt="profile"
-            />
-            <p className="hidden md:block">{user.displayName}</p>
+        {user ? (
+          <div
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer md:cursor-default hover:shadow-md transition"
+          >
+            <AiOutlineMenu className="block md:hidden" />
+            <div className="hidden md:flex items-center gap-3 px-2 py-1">
+              {/* Avatar */}
+              <img
+                className="rounded-full w-8 h-8"
+                referrerPolicy="no-referrer"
+                src={user && user.photoURL ? user.photoURL : avatarImg}
+                alt="profile"
+              />
+              <p className="hidden md:block">{user.displayName}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <Link to="/login">
+            <button
+              className="bg-primary rounded-md px-4 py-2 texmedi
+          text-white duration-300 active:scale-90"
+            >
+              Log In
+            </button>
+          </Link>
+        )}
       </div>
       <p></p>
       {isOpen && (
