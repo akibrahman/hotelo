@@ -8,12 +8,14 @@ const Button = ({
   icon: Icon,
   bg,
   text,
+  className,
 }) => {
   return (
     <button
       disabled={disabled}
       onClick={onClick}
       className={`
+      ${className} 
           relative
           disabled:opacity-70
           disabled:cursor-not-allowed

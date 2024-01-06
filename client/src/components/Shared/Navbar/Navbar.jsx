@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import logoImg from "../../../assets/images/logo.png";
 import Container from "../Container";
 import MenuDropdown from "./MenuDropdown";
 
@@ -12,11 +11,11 @@ const Navbar = () => {
             {/* Logo */}
             <Link to="/">
               <img
-                className="hidden md:block"
-                src={logoImg}
+                className="hidden md:block rounded-full"
+                src="/logo.png"
                 alt="logo"
-                width="100"
-                height="100"
+                width="50"
+                height="50"
               />
             </Link>
             {/* Dropdown Menu */}

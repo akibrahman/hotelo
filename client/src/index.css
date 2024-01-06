@@ -8,6 +8,27 @@ body {
   font-family: "Poppins";
 }
 
+.menulink p {
+  position: relative;
+}
+.menulink p::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 0;
+  height: 3px;
+  background: #000;
+  transition: all 0.25s linear;
+}
+.menulink p:hover::before {
+  width: 100%;
+}
+.active p::before {
+  width: 100%;
+}
+
 .react-calendar {
   border-radius: 10px;
   border: none;

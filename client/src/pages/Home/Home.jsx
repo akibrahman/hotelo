@@ -1,9 +1,7 @@
-import Rooms from "../../components/Rooms/Rooms";
-
 const Home = () => {
   return (
     <div>
-      <Rooms />
+      <p>Home</p>
     </div>
   );
 };

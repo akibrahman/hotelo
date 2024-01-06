@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import Rooms from "../components/Rooms/Rooms";
 import PaymentSuccess from "../components/Shared/PaymentSuccess";
 import Dashboard from "../layouts/Dashboard/Dashboard";
 import Main from "../layouts/Main";
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/rooms",
+        element: <Rooms />,
       },
       {
         path: "/room/:id",
