@@ -27,6 +27,14 @@ const Cancelation = () => {
     toast.success("Concern Approved !");
     navigate(-1);
   };
+  const handleDecline = async () => {
+    const res = await secureAxios.post(
+      `/decline-cancelation/${data.booking._id}/${id}`
+    );
+    console.log(res.data);
+    toast.success("Concern Declined !");
+    navigate(-1);
+  };
   if (!data) return <Loader />;
   return (
     <div className="w-[95%] mb-20">
@@ -76,6 +84,7 @@ const Cancelation = () => {
       {data.status == "resolved" || (
         <div className="flex items-center justify-around w-full mt-5">
           <button
+            onClick={handleDecline}
             className="bg-orange-500 rounded-md px-4 py-2 texmedi
              text-white duration-300 active:scale-90"
           >

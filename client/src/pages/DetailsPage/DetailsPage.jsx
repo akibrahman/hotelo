@@ -69,9 +69,7 @@ const DetailsPage = () => {
       return res.data;
     },
   });
-
   //! Getting all reservations for this room
-
   const reservations = reservationData
     ?.filter((reserve) => reserve.c_status != "approved")
     ?.map(({ _id, startDate, endDate }) => ({
@@ -80,7 +78,6 @@ const DetailsPage = () => {
       endDate: moment(endDate)._d,
       color: "#3B82F6",
     }));
-  console.log("--", reservations);
   //! Selecting Check In Date
   const selectStartDate = (data) => {
     setTotalPrice(0);
@@ -187,7 +184,14 @@ const DetailsPage = () => {
   };
   //! Add Bookings
   const addBookings = async () => {
-    const res = await publicAxios.post("/add-bookings", {
+    const urlData = { prevUrl: window.location.href };
+    const prevUrlString = Object.keys(urlData)
+      .map(
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(urlData[key])}`
+      )
+      .join("&");
+    const res = await publicAxios.post(`/add-bookings?${prevUrlString}`, {
       userId: user._id,
       roomId: id,
       startDate,
@@ -206,10 +210,29 @@ const DetailsPage = () => {
     closeModal();
     toast.success("Processing....");
   };
+
   if (!room || !reservations || !reservationData || !user || !reviews)
     return <Loader />;
   return (
-    <Container>
+    <Container className={"relative"}>
+      {window.location.search == "?errorMsg=Payment-Failed" && (
+        <div className="absolute bg-[rgba(0,0,0,0.8)] left-0 top-0 z-50 w-full h-[90vh] flex items-center justify-center">
+          <div className="rounded-md font-semibold text-lg p-10 px-32 bg-primary text-white z-50 flex items-center justify-center flex-col">
+            <p>We are really Sorry</p>
+            <p>Payment Failed</p>
+            <button
+              onClick={() => {
+                window.location.replace(
+                  window.location.origin + window.location.pathname
+                );
+              }}
+              className="bg-white text-primary px-4 py-2 rounded-md mt-5 duration-300 active:scale-90"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -327,30 +350,34 @@ const DetailsPage = () => {
           <p className="font-semibold my-8 text-neutral-500 text-xl">
             Reviews:
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {reviews.map((review) => (
-              <div
-                className="flex flex-col gap-3 bg-stone-200 p-5 rounded-lg"
-                key={review._id}
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={review.user.photo}
-                    className="w-10 h-10 rounded-full"
-                    alt={review.user.name}
-                  />
-                  <p>{review.user.name}</p>
-                  <Rating
-                    readonly={true}
-                    initialRating={review.rating}
-                    fullSymbol={<FaStar className="ml-1 mt-2" />}
-                    emptySymbol={<FaRegStar className="ml-1 mt-2" />}
-                  />
+          {reviews.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {reviews.map((review) => (
+                <div
+                  className="flex flex-col gap-3 bg-stone-200 p-5 rounded-lg"
+                  key={review._id}
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={review.user.photo}
+                      className="w-10 h-10 rounded-full"
+                      alt={review.user.name}
+                    />
+                    <p>{review.user.name}</p>
+                    <Rating
+                      readonly={true}
+                      initialRating={review.rating}
+                      fullSymbol={<FaStar className="ml-1 mt-2" />}
+                      emptySymbol={<FaRegStar className="ml-1 mt-2" />}
+                    />
+                  </div>
+                  <p>{review.comment}</p>
                 </div>
-                <p>{review.comment}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <Heading title="No Reviews Yet" />
+          )}
         </div>
       </div>
     </Container>

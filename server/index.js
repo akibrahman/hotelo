@@ -256,6 +256,18 @@ async function run() {
     //! Make Bookings
     app.post("/add-bookings", async (req, res) => {
       try {
+        const prevUrlString = Object.keys(
+          Object.fromEntries(new URLSearchParams(req.query).entries())
+        )
+          .map(
+            (key) =>
+              `${encodeURIComponent(key)}=${encodeURIComponent(
+                Object.fromEntries(new URLSearchParams(req.query).entries())[
+                  key
+                ]
+              )}`
+          )
+          .join("&");
         const data = await req.body;
         const result = await bookingsCollection.insertOne({
           userId: data.userId,
@@ -277,7 +289,7 @@ async function run() {
           currency: "BDT",
           tran_id,
           success_url: `${process.env.SERVER_LINK}/payment-success/${tran_id}/${bookingId}/${data.userId}/${data.price}`,
-          fail_url: "http://localhost:3030/fail",
+          fail_url: `${process.env.SERVER_LINK}/payment-fail?${prevUrlString}&bookingId=${bookingId}`,
           cancel_url: "http://localhost:3030/cancel",
           ipn_url: "http://localhost:3030/ipn",
           shipping_method: "Courier",
@@ -313,6 +325,14 @@ async function run() {
         console.log(error);
         res.status(500).send({ message: "Internal Server Error" });
       }
+    });
+
+    //! Payment Fail
+    app.post("/payment-fail", async (req, res) => {
+      const queryParams = new URLSearchParams(req.query);
+      const data = Object.fromEntries(queryParams.entries());
+      await bookingsCollection.deleteOne({ _id: new ObjectId(data.bookingId) });
+      res.redirect(data.prevUrl + "?errorMsg=Payment-Failed");
     });
 
     //! Payment Success
@@ -653,6 +673,33 @@ async function run() {
           await cancelCollection.updateOne(
             { _id: new ObjectId(reqId) },
             { $set: { status: "resolved" } }
+          );
+          res.send({ message: "All Done" });
+        } catch (error) {
+          console.log(error);
+          res.send({ message: "Internal Server Error" });
+        }
+      }
+    );
+    //! Decline Cancelation
+    app.post(
+      "/decline-cancelation/:bookingId/:reqId",
+      verifyToken,
+      async (req, res) => {
+        try {
+          const bookingId = req.params.bookingId;
+          const reqId = req.params.reqId;
+          await cancelCollection.updateOne(
+            { _id: new ObjectId(reqId) },
+            { $set: { status: "resolved" } }
+          );
+          await bookingsCollection.updateOne(
+            { _id: new ObjectId(bookingId) },
+            {
+              $set: {
+                c_status: "declined",
+              },
+            }
           );
           res.send({ message: "All Done" });
         } catch (error) {
