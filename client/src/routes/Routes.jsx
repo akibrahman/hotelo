@@ -5,6 +5,8 @@ import Dashboard from "../layouts/Dashboard/Dashboard";
 import Main from "../layouts/Main";
 import AddRoom from "../pages/AddRoom";
 import AllRooms from "../pages/AllRooms";
+import Cancelation from "../pages/Cancelation";
+import Cancelations from "../pages/Cancelations";
 import DetailsPage from "../pages/DetailsPage/DetailsPage";
 import EditRoom from "../pages/EditRoom";
 import ErrorPage from "../pages/ErrorPage";
@@ -70,6 +72,14 @@ export const router = createBrowserRouter([
       {
         path: "edit-room/:id",
         element: <EditRoom />,
+      },
+      {
+        path: "cancelation-requestes",
+        element: <Cancelations />,
+      },
+      {
+        path: "cancelation-requestes/:id",
+        element: <Cancelation />,
       },
       //! User
       {

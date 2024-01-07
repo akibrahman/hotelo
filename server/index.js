@@ -60,6 +60,7 @@ async function run() {
     const paymentsCollection = dataBase.collection("Payments");
     const reviewsCollection = dataBase.collection("Reviews");
     const cancelCollection = dataBase.collection("Cancels");
+    const refundCollection = dataBase.collection("Refunds");
 
     //!Cron Job
     app.post("/update-bookings", async (req, res) => {
@@ -311,6 +312,7 @@ async function run() {
         res.status(500).send({ message: "Internal Server Error" });
       }
     });
+
     //! Payment Success
     app.post(
       "/payment-success/:tranId/:bookingId/:userId/:amount",
@@ -425,6 +427,251 @@ async function run() {
         }
       }
     );
+
+    //! Get all or one Cancelation Requests - Admin
+    app.get("/cancelation-reqs", verifyToken, async (req, res) => {
+      const id = req.query.id;
+      if (id) {
+        const reqs = await cancelCollection
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(id),
+              },
+            },
+            {
+              $addFields: {
+                userIdObj: {
+                  $convert: {
+                    input: "$userId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $addFields: {
+                roomIdObj: {
+                  $convert: {
+                    input: "$roomId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $addFields: {
+                bookingIdObj: {
+                  $convert: {
+                    input: "$bookingId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Users",
+                localField: "userIdObj",
+                foreignField: "_id",
+                as: "user",
+              },
+            },
+            {
+              $unwind: "$user",
+            },
+            {
+              $lookup: {
+                from: "Rooms",
+                localField: "roomIdObj",
+                foreignField: "_id",
+                as: "room",
+              },
+            },
+            {
+              $unwind: "$room",
+            },
+            {
+              $lookup: {
+                from: "Bookings",
+                localField: "bookingIdObj",
+                foreignField: "_id",
+                as: "booking",
+              },
+            },
+            {
+              $unwind: "$booking",
+            },
+            {
+              $lookup: {
+                from: "Payments",
+                localField: "bookingId",
+                foreignField: "bookingId",
+                as: "payment",
+              },
+            },
+            {
+              $unwind: "$payment",
+            },
+          ])
+          .toArray();
+        console.log("With ID");
+        res.send(reqs);
+      } else {
+        const reqs = await cancelCollection
+          .aggregate([
+            {
+              $addFields: {
+                userIdObj: {
+                  $convert: {
+                    input: "$userId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $addFields: {
+                roomIdObj: {
+                  $convert: {
+                    input: "$roomId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $addFields: {
+                bookingIdObj: {
+                  $convert: {
+                    input: "$bookingId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Users",
+                localField: "userIdObj",
+                foreignField: "_id",
+                as: "user",
+              },
+            },
+            {
+              $unwind: "$user",
+            },
+            {
+              $lookup: {
+                from: "Rooms",
+                localField: "roomIdObj",
+                foreignField: "_id",
+                as: "room",
+              },
+            },
+            {
+              $unwind: "$room",
+            },
+            {
+              $lookup: {
+                from: "Bookings",
+                localField: "bookingIdObj",
+                foreignField: "_id",
+                as: "booking",
+              },
+            },
+            {
+              $unwind: "$booking",
+            },
+            {
+              $lookup: {
+                from: "Payments",
+                localField: "bookingId",
+                foreignField: "bookingId",
+                as: "payment",
+              },
+            },
+            {
+              $unwind: "$payment",
+            },
+          ])
+          .toArray();
+        console.log("Without ID");
+        res.send(reqs);
+      }
+    });
+
+    //! Approve Cancelation
+    app.post(
+      "/approve-cancelation/:bookingId/:tranId/:userId/:reqId",
+      verifyToken,
+      async (req, res) => {
+        try {
+          //Status Upgration of Booking
+          const bookingId = req.params.bookingId;
+          const userId = req.params.userId;
+          const tranId = req.params.tranId;
+          const reqId = req.params.reqId;
+          await bookingsCollection.updateOne(
+            { _id: new ObjectId(bookingId) },
+            {
+              $set: {
+                c_status: "approved",
+              },
+            }
+          );
+          // Initiate Refund
+          const sslcz = new ssl(
+            process.env.SSL_STORE_ID,
+            process.env.SSL_STORE_PASSWORD,
+            false
+          );
+          const tranData = await sslcz.transactionQueryByTransactionId({
+            tran_id: tranId,
+          });
+          console.log(tranData);
+          const refundData = {
+            refund_amount: parseFloat(tranData.element[0].currency_amount),
+            refund_remarks: "Test",
+            bank_tran_id: tranData.element[0].bank_tran_id,
+            refe_id: "TestRefId",
+          };
+          const { bank_tran_id, trans_id, refund_ref_id } =
+            await sslcz.initiateRefund(refundData);
+          const refundResData = {
+            refundDate: new Date().toISOString(),
+            userId,
+            bank_tran_id,
+            trans_id,
+            refund_ref_id,
+            amount: parseFloat(tranData.element[0].currency_amount),
+          };
+          await refundCollection.insertOne(refundResData);
+          await cancelCollection.updateOne(
+            { _id: new ObjectId(reqId) },
+            { $set: { status: "resolved" } }
+          );
+          res.send({ message: "All Done" });
+        } catch (error) {
+          console.log(error);
+          res.send({ message: "Internal Server Error" });
+        }
+      }
+    );
+    app.post("/refund-query", (req, res) => {
+      const data = {
+        refund_ref_id: "659a4299811be",
+      };
+      const sslcz = new ssl(
+        process.env.SSL_STORE_ID,
+        process.env.SSL_STORE_PASSWORD,
+        false
+      );
+      sslcz.refundQuery(data).then((data) => {
+        console.log(data);
+        res.send(data.status);
+      });
+    });
     //! Get My Bookings
     app.get("/my-bookings/:userId", async (req, res) => {
       try {
@@ -608,26 +855,6 @@ async function run() {
         .toArray();
       res.send(reviews);
     });
-
-    //! Cron Schedule
-    // cron.schedule("0 0 * * *", async () => {
-    //   console.log("Started");
-    //   const bookings = await bookingsCollection.find({}).toArray();
-    //   for (const booking of bookings) {
-    //     const thatDat = new Date(booking.startDate);
-    //     const today = new Date();
-    //     if (
-    //       thatDat.getFullYear() === today.getFullYear() &&
-    //       thatDat.getMonth() === today.getMonth() &&
-    //       thatDat.getDate() === today.getDate()
-    //     ) {
-    //       await bookingsCollection.updateOne(
-    //         { _id: new ObjectId(booking._id) },
-    //         { $set: { enjoyed: true } }
-    //       );
-    //     }
-    //   }
-    // });
   } finally {
   }
 }

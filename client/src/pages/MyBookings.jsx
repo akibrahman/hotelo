@@ -93,6 +93,7 @@ const MyBookings = () => {
       roomId: booking.roomId,
       bookingId: booking._id,
       reason: comment,
+      status: "pending",
     };
     await secureAxios.post("/rais-cancel", reason);
     toast.success("Cancelation Request Successfully Submitted");

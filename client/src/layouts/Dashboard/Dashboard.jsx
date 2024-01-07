@@ -74,7 +74,10 @@ const Dashboard = () => {
                 </NavLink>
               </li>
               <li className="rounded-md bg-slate-300">
-                <NavLink to="/dashboard/all-rooms" className={"py-3"}>
+                <NavLink
+                  to="/dashboard/cancelation-requestes"
+                  className={"py-3"}
+                >
                   Cancelation Requestes
                 </NavLink>
               </li>
