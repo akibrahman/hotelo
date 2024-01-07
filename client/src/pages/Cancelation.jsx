@@ -36,6 +36,7 @@ const Cancelation = () => {
       <div className="grid grid-cols-2 gap-5">
         <div className="bg-stone-200 p-5 flex flex-col items-center gap-3 rounded-md">
           <p className="text-2xl font-bold mb-5">Room Details</p>
+
           <img
             src={data.room.image}
             className="aspect-video rounded-md w-44"
@@ -67,26 +68,28 @@ const Cancelation = () => {
         </div>
         <div className="bg-stone-200 p-5 flex flex-col items-center gap-3 rounded-md">
           <p className="text-2xl font-bold mb-5">Cancelation Details</p>
-          <p>Cancelation Date: {new Date(data.date).toDateString()}</p>
+          <p>Issued Date: {new Date(data.date).toDateString()}</p>
           <p className="font-bold text-xl underline">Reason</p>
           <p className="text-center">{data.reason}</p>
         </div>
       </div>
-      <div className="flex items-center justify-around w-full mt-5">
-        <button
-          className="bg-orange-500 rounded-md px-4 py-2 texmedi
+      {data.status == "resolved" || (
+        <div className="flex items-center justify-around w-full mt-5">
+          <button
+            className="bg-orange-500 rounded-md px-4 py-2 texmedi
              text-white duration-300 active:scale-90"
-        >
-          Decline
-        </button>
-        <button
-          onClick={handleApprove}
-          className="bg-green-500 rounded-md px-4 py-2 texmedi
+          >
+            Decline
+          </button>
+          <button
+            onClick={handleApprove}
+            className="bg-green-500 rounded-md px-4 py-2 texmedi
              text-white duration-300 active:scale-90"
-        >
-          Approve
-        </button>
-      </div>
+          >
+            Approve
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -267,6 +267,8 @@ async function run() {
           status: "due",
           enjoyed: false,
           reviewed: false,
+          c_req: false,
+          c_status: "processing",
         });
         const bookingId = result.insertedId.toString();
         const tran_id = new ObjectId().toString();
@@ -641,6 +643,7 @@ async function run() {
           const refundResData = {
             refundDate: new Date().toISOString(),
             userId,
+            bookingId,
             bank_tran_id,
             trans_id,
             refund_ref_id,
@@ -703,6 +706,7 @@ async function run() {
               $unwind: "$room",
             },
           ])
+          .sort({ _id: -1 })
           .toArray();
         res.send(bookings);
       } catch (error) {

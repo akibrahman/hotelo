@@ -32,9 +32,16 @@ const Cancelations = () => {
       <div className="flex flex-col gap-3">
         {reqs.map((req) => (
           <div
-            className="bg-stone-300 p-5 rounded-md flex items-center justify-between text-sm"
+            className="bg-stone-300 p-5 rounded-md flex items-center justify-between text-sm relative"
             key={req._id}
           >
+            {req.status == "resolved" && (
+              <img
+                src="/resolved.png"
+                className="w-20 absolute right-5 -top-5 z-10"
+                alt=""
+              />
+            )}
             <img
               src={req.room.image}
               className="aspect-video rounded-md w-32"
@@ -55,7 +62,7 @@ const Cancelations = () => {
                 Request Date: {new Date(req.date).toDateString()}
               </p>
             </div>
-            <div className="">
+            <div className="z-20">
               <Link to={`/dashboard/cancelation-requestes/${req._id}`}>
                 <button
                   className="bg-primary rounded-md px-4 py-2 texmedi

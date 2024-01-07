@@ -69,13 +69,18 @@ const DetailsPage = () => {
       return res.data;
     },
   });
+
   //! Getting all reservations for this room
-  const reservations = reservationData?.map(({ _id, startDate, endDate }) => ({
-    key: _id,
-    startDate: moment(startDate)._d,
-    endDate: moment(endDate)._d,
-    color: "#3B82F6",
-  }));
+
+  const reservations = reservationData
+    ?.filter((reserve) => reserve.c_status != "approved")
+    ?.map(({ _id, startDate, endDate }) => ({
+      key: _id,
+      startDate: moment(startDate)._d,
+      endDate: moment(endDate)._d,
+      color: "#3B82F6",
+    }));
+  console.log("--", reservations);
   //! Selecting Check In Date
   const selectStartDate = (data) => {
     setTotalPrice(0);
