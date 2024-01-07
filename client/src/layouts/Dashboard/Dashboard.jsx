@@ -1,9 +1,17 @@
+import toast from "react-hot-toast";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import Loader from "../../components/Shared/Loader";
+import useAuth from "../../hooks/useAuth";
 import useUser from "../../hooks/useUser";
 
 const Dashboard = () => {
   const user = useUser();
+  const { logOut } = useAuth();
+
+  const handleLogOut = async () => {
+    await logOut();
+    toast.success("Successfully Logged Out");
+  };
   if (!user) return <Loader />;
   return (
     <div className="drawer lg:drawer-open">
@@ -25,12 +33,23 @@ const Dashboard = () => {
           className="drawer-overlay"
         ></label>
         <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-          <Link
-            to="/"
-            className="bg-primary text-center text-white p-4 rounded-md mb-10"
-          >
-            <p className="text-4xl mb-">Hotelo LTD.</p>
-            <p className="">The Best you can Stay</p>
+          <Link to="/dashboard/my-profile">
+            <div className="flex flex-col items-center gap-3 mb-5">
+              <img src={user.photo} className="rounded-full w-32 h-32" alt="" />
+              <div className="text-center">
+                <p>{user.name}</p>
+                <p>{user.email}</p>
+                <div className="flex items-center justify-center gap-10 mt-2">
+                  <button
+                    onClick={handleLogOut}
+                    className="bg-red-500 rounded-md px-3 py-1 texmedi
+             text-white duration-300 active:scale-90"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
           </Link>
           {/* Sidebar content here */}
           {user.role == "admin" && (
@@ -54,11 +73,6 @@ const Dashboard = () => {
           )}
           {user.role == "guest" && (
             <ul className="font-semibold space-y-2">
-              <li className="rounded-md bg-slate-300">
-                <NavLink to="/dashboard/my-profile" className={"py-3"}>
-                  My Profile
-                </NavLink>
-              </li>
               <li className="rounded-md bg-slate-300">
                 <NavLink to="/dashboard/my-bookings" className={"py-3"}>
                   My Bookings

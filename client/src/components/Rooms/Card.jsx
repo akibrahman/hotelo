@@ -15,9 +15,9 @@ const Card = ({ room }) => {
   });
   const [rating, setRating] = useState(0);
   useEffect(() => {
-    if (reviews.length > 0) {
-      const data = reviews.reduce((a, b) => a + b.rating, 0);
-      setRating(data / reviews.length);
+    if (reviews?.length > 0) {
+      const data = reviews?.reduce((a, b) => a + b.rating, 0);
+      setRating(data / reviews?.length);
     }
   }, [room, reviews]);
   return (

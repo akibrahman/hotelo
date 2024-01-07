@@ -319,7 +319,7 @@ const DetailsPage = () => {
           </div>
         </div>
         <div className="">
-          <p className="font-semibold mb-8 text-neutral-500 text-lg">
+          <p className="font-semibold my-8 text-neutral-500 text-xl">
             Reviews:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
