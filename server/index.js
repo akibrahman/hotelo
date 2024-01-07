@@ -59,17 +59,43 @@ async function run() {
     const bookingsCollection = dataBase.collection("Bookings");
     const paymentsCollection = dataBase.collection("Payments");
     const reviewsCollection = dataBase.collection("Reviews");
+    const cancelCollection = dataBase.collection("Cancels");
 
-    //!Test
-    // app.post("/boooooom", async () => {
-    //   (await roomsCollection.find().toArray()).map(async (user) => {
-    //     await roomsCollection.updateOne(
-    //       { _id: user._id },
-    //       { $set: { likes: 0 } }
-    //     );
-    //   });
-    //   console.log("A Big Done");
-    // });
+    //!Cron Job
+    app.post("/update-bookings", async (req, res) => {
+      let totalBookings;
+      let updatedCount = 0;
+      const bookings = await bookingsCollection.find({}).toArray();
+      totalBookings = bookings.length;
+
+      for (const booking of bookings) {
+        const thatDay = new Date(booking.startDate).toLocaleDateString(
+          "en-GB",
+          { timeZone: "Asia/Dhaka" }
+        );
+        const today = new Date().toLocaleDateString("en-GB", {
+          timeZone: "Asia/Dhaka",
+        });
+        if (today == thatDay) {
+          updatedCount++;
+          console.log("This Booking will update now: ", booking);
+          await bookingsCollection.updateOne(
+            { _id: new ObjectId(booking._id) },
+            { $set: { enjoyed: true } }
+          );
+        }
+      }
+      res.send({ totalBookings, updatedCount });
+    });
+    app.post("/boooooom", async () => {
+      (await bookingsCollection.find().toArray()).map(async (book) => {
+        await bookingsCollection.updateOne(
+          { _id: book._id },
+          { $set: { c_req: false, c_status: "processing" } }
+        );
+      });
+      console.log("A Big Done");
+    });
 
     //! Create Token by JWT
     app.post("/jwt", async (req, res) => {
@@ -509,6 +535,22 @@ async function run() {
           ])
           .toArray();
         res.send(booking);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
+
+    //! Post a cancel Request
+    app.post("/rais-cancel", async (req, res) => {
+      try {
+        const reason = await req.body;
+        const result = await cancelCollection.insertOne(reason);
+        await bookingsCollection.updateOne(
+          { _id: new ObjectId(reason.bookingId) },
+          { $set: { c_req: true } }
+        );
+        res.send(result);
       } catch (error) {
         console.log(error);
         res.status(500).send({ message: "Internal Server Error" });

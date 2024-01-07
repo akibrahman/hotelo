@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import { FaHome } from "react-icons/fa";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import Loader from "../../components/Shared/Loader";
 import useAuth from "../../hooks/useAuth";
@@ -34,7 +35,10 @@ const Dashboard = () => {
         ></label>
         <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
           <Link to="/dashboard/my-profile">
-            <div className="flex flex-col items-center gap-3 mb-5">
+            <div className="flex flex-col items-center gap-3 mb-5 relative">
+              <Link className="absolute top-2 left-2" to="/">
+                <FaHome className="text-xl text-primary" />
+              </Link>
               <img src={user.photo} className="rounded-full w-32 h-32" alt="" />
               <div className="text-center">
                 <p>{user.name}</p>
@@ -67,6 +71,11 @@ const Dashboard = () => {
               <li className="rounded-md bg-slate-300">
                 <NavLink to="/dashboard/all-rooms" className={"py-3"}>
                   All Rooms
+                </NavLink>
+              </li>
+              <li className="rounded-md bg-slate-300">
+                <NavLink to="/dashboard/all-rooms" className={"py-3"}>
+                  Cancelation Requestes
                 </NavLink>
               </li>
             </ul>
