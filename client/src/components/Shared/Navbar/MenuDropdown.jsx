@@ -21,16 +21,16 @@ const MenuDropdown = () => {
           <NavLink to="/">
             <p>Home</p>
           </NavLink>
-          <NavLink to="/about">
+          {/* <NavLink to="/about">
             <p>About</p>
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/rooms">
             <p>Rooms</p>
           </NavLink>
-          <NavLink to="/contact-us">
+          {/* <NavLink to="/contact-us">
             <p>Contact Us</p>
-          </NavLink>
-          <NavLink to="/dashboard">
+          </NavLink> */}
+          <NavLink to="/dashboard/my-profile">
             <p>Dashboard</p>
           </NavLink>
         </div>
