@@ -6,21 +6,18 @@ import Modal from "react-modal";
 import secureAxios from "../API/secureAxios";
 import Button from "../components/Button/Button";
 import Loader from "../components/Shared/Loader";
-import useUser from "../hooks/useUser";
 
-const MyPayments = () => {
-  const user = useUser();
+const AllPayments = () => {
   const [payment, setPayment] = useState(null);
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(false);
   //! Get All Payments
   const { data: payments } = useQuery({
-    queryKey: ["my-payments", user?._id],
-    queryFn: async ({ queryKey }) => {
-      const res = await secureAxios.get(`/my-payments/${queryKey[1]}`);
+    queryKey: ["all-payments", "admin"],
+    queryFn: async () => {
+      const res = await secureAxios.get(`/all-payments-admin`);
       return res.data;
     },
-    enabled: user ? true : false,
   });
   //! Get One payment details
   const paymentDetails = async (tranId) => {
@@ -62,10 +59,10 @@ const MyPayments = () => {
   const download = () => {
     console.log("Ok");
   };
-  if (!user || !payments) return <Loader />;
+  if (!payments) return <Loader />;
 
   return (
-    <div className="flex flex-col items-center mt-8 w-[95%] relative">
+    <div className="mt-8 w-[95%] relative">
       <Modal
         isOpen={modalIsOpen2}
         onRequestClose={closeModal2}
@@ -73,10 +70,11 @@ const MyPayments = () => {
       >
         <div className="p-10 space-y-3 border border-primary rounded-md">
           <div className="flex items-center gap-2">
-            <p className="font-semibold">Name:</p> <p>{user.name}</p>
+            <p className="font-semibold">Name:</p> <p>{booking?.user.name}</p>
           </div>
           <div className="flex items-center gap-2">
-            <p className="font-semibold">E-mail:</p> <p>{user.email}</p>
+            <p className="font-semibold">E-mail:</p>{" "}
+            <p>{booking?.user.email}</p>
           </div>
           <div className="flex items-center gap-2">
             <p className="font-semibold">Room Name:</p>{" "}
@@ -127,10 +125,10 @@ const MyPayments = () => {
 
               <div className="text-center">
                 <p className="font-semibold">To:</p>
-                <p>{user.name}</p>
+                <p>{booking?.user.name}</p>
                 <p>456 Client Street</p>
                 <p>Uttara, Dhaka, 1230</p>
-                <p>Email: {user.email}</p>
+                <p>Email: {booking?.user.email}</p>
               </div>
             </div>
 
@@ -177,7 +175,9 @@ const MyPayments = () => {
           </div>
         </div>
       </Modal>
-      <h2 className="text-2xl font-bold mb-10">Payments List</h2>
+      <h2 className="text-2xl font-bold mb-10">
+        All Payments - {payments?.length}
+      </h2>
       {loading && <FaSpinner className="absolute left-2 top-2 animate-spin" />}
       <div className="w-full grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
         {payments.map((payment) => (
@@ -216,6 +216,7 @@ const MyPayments = () => {
               <Button
                 onClick={async () => {
                   setLoading(true);
+                  await bookingDetails(payment.bookingId);
                   await paymentDetails(payment.transactionId);
                   openModal();
                   setLoading(false);
@@ -232,4 +233,4 @@ const MyPayments = () => {
   );
 };
 
-export default MyPayments;
+export default AllPayments;

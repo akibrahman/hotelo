@@ -4,6 +4,9 @@ import PaymentSuccess from "../components/Shared/PaymentSuccess";
 import Dashboard from "../layouts/Dashboard/Dashboard";
 import Main from "../layouts/Main";
 import AddRoom from "../pages/AddRoom";
+import AllBookings from "../pages/AllBookings";
+import AllCustomers from "../pages/AllCustomers";
+import AllPayments from "../pages/AllPayments";
 import AllRooms from "../pages/AllRooms";
 import Cancelation from "../pages/Cancelation";
 import Cancelations from "../pages/Cancelations";
@@ -68,6 +71,18 @@ export const router = createBrowserRouter([
       {
         path: "all-rooms",
         element: <AllRooms />,
+      },
+      {
+        path: "all-customers",
+        element: <AllCustomers />,
+      },
+      {
+        path: "all-bookings",
+        element: <AllBookings />,
+      },
+      {
+        path: "all-payments",
+        element: <AllPayments />,
       },
       {
         path: "edit-room/:id",

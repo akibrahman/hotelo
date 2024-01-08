@@ -213,7 +213,7 @@ const MyBookings = () => {
           </div>
         </div>
       </ReactModal>
-      <h2 className="text-2xl font-bold mb-10">Bookings</h2>
+      <h2 className="text-2xl font-bold mb-10">My Bookings</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {bookings.map((booking) => (
           <div

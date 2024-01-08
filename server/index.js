@@ -158,7 +158,11 @@ async function run() {
       );
       res.send(result);
     });
-
+    //! Get All User
+    app.get("/all-users", verifyToken, async (req, res) => {
+      const users = await usersCollection.find().toArray();
+      res.send(users);
+    });
     //! Get user
     app.get("/user/:email", verifyToken, async (req, res) => {
       try {
@@ -634,6 +638,16 @@ async function run() {
           const userId = req.params.userId;
           const tranId = req.params.tranId;
           const reqId = req.params.reqId;
+          await paymentsCollection.updateOne(
+            {
+              transactionId: tranId,
+            },
+            {
+              $set: {
+                status: "refunded",
+              },
+            }
+          );
           await bookingsCollection.updateOne(
             { _id: new ObjectId(bookingId) },
             {
@@ -722,6 +736,62 @@ async function run() {
         res.send(data.status);
       });
     });
+    //! Get all Bookings - Admin
+    app.get("/all-bookings-admin", verifyToken, async (req, res) => {
+      try {
+        const bookings = await bookingsCollection
+          .aggregate([
+            {
+              $addFields: {
+                userIdObj: {
+                  $convert: {
+                    input: "$userId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $addFields: {
+                roomIdObj: {
+                  $convert: {
+                    input: "$roomId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Users",
+                localField: "userIdObj",
+                foreignField: "_id",
+                as: "user",
+              },
+            },
+            {
+              $unwind: "$user",
+            },
+            {
+              $lookup: {
+                from: "Rooms",
+                localField: "roomIdObj",
+                foreignField: "_id",
+                as: "room",
+              },
+            },
+            {
+              $unwind: "$room",
+            },
+          ])
+          .sort({ _id: -1 })
+          .toArray();
+        res.send(bookings);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
     //! Get My Bookings
     app.get("/my-bookings/:userId", async (req, res) => {
       try {
@@ -762,6 +832,16 @@ async function run() {
       }
     });
 
+    //! Get All Payments - Admin
+    app.get("/all-payments-admin", async (req, res) => {
+      try {
+        const payments = await paymentsCollection.aggregate([]).toArray();
+        res.send(payments);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
     //! Get My Payments
     app.get("/my-payments/:userId", async (req, res) => {
       try {
@@ -818,6 +898,27 @@ async function run() {
                   },
                 },
               },
+            },
+            {
+              $addFields: {
+                userIdObj: {
+                  $convert: {
+                    input: "$userId",
+                    to: "objectId",
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "Users",
+                localField: "userIdObj",
+                foreignField: "_id",
+                as: "user",
+              },
+            },
+            {
+              $unwind: "$user",
             },
             {
               $lookup: {

@@ -14,20 +14,6 @@ const Cancelations = () => {
   if (!reqs) return <Loader />;
   return (
     <div className="w-[95%]">
-      {/* <Button
-        onClick={async () => {
-          const { data } = await publicAxios.post("/refund");
-          console.log(data);
-        }}
-        label={"Refund"}
-      ></Button>
-      <Button
-        onClick={async () => {
-          const { data } = await publicAxios.post("/refund-query");
-          console.log(data);
-        }}
-        label={"Refund Query"}
-      ></Button> */}
       <h2 className="text-2xl font-bold my-10">Cancelation Requests</h2>
       <div className="flex flex-col gap-3">
         {reqs.map((req) => (

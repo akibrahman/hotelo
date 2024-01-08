@@ -64,6 +64,21 @@ const Dashboard = () => {
                 </NavLink>
               </li>
               <li className="rounded-md bg-slate-300">
+                <NavLink to="/dashboard/all-customers" className={"py-3"}>
+                  All Customers
+                </NavLink>
+              </li>
+              <li className="rounded-md bg-slate-300">
+                <NavLink to="/dashboard/all-bookings" className={"py-3"}>
+                  All Bookings
+                </NavLink>
+              </li>
+              <li className="rounded-md bg-slate-300">
+                <NavLink to="/dashboard/all-payments" className={"py-3"}>
+                  All Payments
+                </NavLink>
+              </li>
+              <li className="rounded-md bg-slate-300">
                 <NavLink to="/dashboard/add-room" className={"py-3"}>
                   Add Room
                 </NavLink>
