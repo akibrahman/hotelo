@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import ReactModal from "react-modal";
 import Rating from "react-rating";
+import { capitalizer } from "../API/capitalizer";
 import secureAxios from "../API/secureAxios";
 import Button from "../components/Button/Button";
 import Loader from "../components/Shared/Loader";
@@ -248,12 +249,17 @@ const MyBookings = () => {
                   Reviewed
                 </p>
               ) : booking.c_req && booking.c_status == "declined" ? (
-                <p className="text-center text-red-500 font-semibold mx-auto w-min">
-                  Cancaletion Declined
-                </p>
+                <Button
+                  onClick={async () => {
+                    toast.error("Already Declined this Cancelation!");
+                  }}
+                  label={"Cancle"}
+                  small={true}
+                  bg={"bg-red-400"}
+                />
               ) : booking.c_req && booking.c_status == "approved" ? (
                 <p className="text-center text-green-500 font-semibold mx-auto w-min">
-                  Cancaletion Approved
+                  Cancelation Approved
                 </p>
               ) : booking.c_req && booking.c_status == "processing" ? (
                 <p className="text-center text-red-500 font-semibold mx-auto w-min">
@@ -293,41 +299,6 @@ const MyBookings = () => {
                   bg={"bg-red-400"}
                 />
               )}
-
-              {/* {booking.enjoyed && !booking.reviewed ? (
-                <Button
-                  onClick={async () => {
-                    await bookingDetails(booking._id);
-                    openModal();
-                  }}
-                  label={"Review"}
-                  small={true}
-                  bg={"bg-green-400"}
-                />
-              ) : booking.enjoyed && booking.reviewed ? (
-                <p className="text-center text-green-500 font-semibold">
-                  Reviewed
-                </p>
-              ) : (
-                <Button
-                  onClick={async () => {
-                    if (
-                      moment(booking.startDate).diff(moment.now(), "hours") < 24
-                    ) {
-                      toast.error("Cann't cancel ! Less than 24 Hours left !");
-                      return;
-                    }
-                    await bookingDetails(booking._id);
-                    openModal2();
-                    console.log(
-                      moment(booking.startDate).diff(moment.now(), "hours")
-                    );
-                  }}
-                  label={"Cancle"}
-                  small={true}
-                  bg={"bg-red-400"}
-                />
-              )} */}
             </div>
             <div className="space-y-2">
               <p>{booking.room.title}</p>
@@ -339,7 +310,7 @@ const MyBookings = () => {
               <p className="bg-primary px-4 text-white w-max rounded-full">
                 {booking.c_req && booking.c_status == "approved"
                   ? "Refunded"
-                  : booking.status}
+                  : capitalizer(booking.status)}
               </p>
             </div>
           </div>
