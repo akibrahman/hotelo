@@ -1,16 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import secureAxios from "../API/secureAxios";
 import Loader from "../components/Shared/Loader";
 
 const AllCustomers = () => {
   //   const customers = ["", "", "", "", "", "", "", ""];
-  const { data: customers } = useQuery({
+  const { data: customers, refetch } = useQuery({
     queryKey: ["all-user", "admin"],
     queryFn: async () => {
       const { data } = await secureAxios.get("/all-users");
       return data;
     },
   });
+  const makeAdmin = async (id, name) => {
+    await secureAxios.post(`/make-admin/${id}`);
+    await refetch();
+    toast.success(name + " made Admin");
+  };
   if (!customers) return <Loader />;
   return (
     <div className="w-[95%]">
@@ -33,9 +39,15 @@ const AllCustomers = () => {
                 Admin
               </p>
             ) : (
-              <button className="bg-white px-4 py-2 rounded-md font-semibold duration-300 active:scale-90">
-                Make Admin
-              </button>
+              //   <button
+              //     onClick={() => makeAdmin(customer._id, customer.name)}
+              //     className="bg-white px-4 py-2 rounded-md font-semibold duration-300 active:scale-90"
+              //   >
+              //     Make Admin
+              //   </button>
+              <p className="text-red-500 text-sm w-[200px]">
+                Vercel Error. Will be available after vercel&apos;s perform
+              </p>
             )}
           </div>
         ))}

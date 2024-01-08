@@ -158,6 +158,15 @@ async function run() {
       );
       res.send(result);
     });
+    //! Make Admin -admin
+    app.post("/make-admin/:id", async (req, res) => {
+      const id = req.params.id;
+      await usersCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { role: "admin" } }
+      );
+      res.send({ msg: "Done" });
+    });
     //! Get All User
     app.get("/all-users", verifyToken, async (req, res) => {
       const users = await usersCollection.find().toArray();

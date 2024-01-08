@@ -12,11 +12,5 @@
       "dest": "index.js",
       "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron",
-      "schedule": "37 10 * * *"
-    }
   ]
 }
