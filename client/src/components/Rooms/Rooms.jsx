@@ -13,7 +13,6 @@ const Rooms = () => {
       return res.data;
     },
   });
-  console.log(rooms);
   if (isLoading) return <Loader />;
 
   return (

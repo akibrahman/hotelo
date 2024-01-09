@@ -26,7 +26,7 @@ const Card = ({ room }) => {
         <div className="overflow-hidden rounded-lg relative">
           <div className="absolute z-10 top-1 left-1 bg-white flex items-center gap-1 px-2 rounded-md py-1">
             <img src="/star.svg" className="" alt="" />
-            <p className="text-xs">{rating == 0 ? "N/A" : rating}</p>
+            <p className="text-xs">{rating == 0 ? "N/A" : rating.toFixed(1)}</p>
           </div>
           <img
             src={room.image}

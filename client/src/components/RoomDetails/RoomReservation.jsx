@@ -19,7 +19,7 @@ const RoomReservation = ({
   // setValue(ranges[Object.keys(ranges)[0]]);
   // };
   const [isLiked, setIsLiked] = useState(
-    user.likings.map((like) => like == room._id).length > 0
+    user.likings.find((like) => like == room._id) == undefined ? false : true
   );
   const [likes, setLikes] = useState(room.likes);
   const like = async () => {
