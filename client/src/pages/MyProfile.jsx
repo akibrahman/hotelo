@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 import { capitalizer } from "../API/capitalizer";
 import Loader from "../components/Shared/Loader";
 import useAuth from "../hooks/useAuth";
@@ -47,12 +48,14 @@ const MyProfile = () => {
           </div>
           {/* Add more details as needed */}
           <div className="flex items-center justify-center gap-10">
-            <button
-              className="bg-orange-500 rounded-md px-4 py-2 texmedi
+            <Link to="/dashboard/edit-profile">
+              <button
+                className="bg-orange-500 rounded-md px-4 py-2 texmedi
              text-white duration-300 active:scale-90"
-            >
-              Edit
-            </button>
+              >
+                Edit
+              </button>
+            </Link>
             <button
               onClick={handleLogOut}
               className="bg-red-500 rounded-md px-4 py-2 texmedi

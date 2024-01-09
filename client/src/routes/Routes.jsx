@@ -11,6 +11,7 @@ import AllRooms from "../pages/AllRooms";
 import Cancelation from "../pages/Cancelation";
 import Cancelations from "../pages/Cancelations";
 import DetailsPage from "../pages/DetailsPage/DetailsPage";
+import EditProfile from "../pages/EditProfile";
 import EditRoom from "../pages/EditRoom";
 import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
@@ -100,6 +101,10 @@ export const router = createBrowserRouter([
       {
         path: "my-profile",
         element: <MyProfile />,
+      },
+      {
+        path: "edit-profile",
+        element: <EditProfile />,
       },
       {
         path: "my-bookings",

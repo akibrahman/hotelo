@@ -142,8 +142,8 @@ async function run() {
         await usersCollection.updateOne(query, {
           $set: {
             name: user.name,
-            photo: user.photo,
-            timestamp: Date.now(),
+            photo: isExist.photo ? isExist.photo : user.photo,
+            timestamp: new Date().toISOString(),
           },
         });
         res.send(isExist);
@@ -159,7 +159,7 @@ async function run() {
       res.send(result);
     });
     //! Make Admin -admin
-    app.post("/make-admin/:id", async (req, res) => {
+    app.post("/make-admin/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       await usersCollection.updateOne(
         { _id: new ObjectId(id) },
