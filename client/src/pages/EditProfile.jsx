@@ -48,7 +48,6 @@ const EditProfile = () => {
       toast.success("Profile Updated");
       navigate("/dashboard/my-profile");
     }
-    await user.refetch();
     setLoading(false);
   };
 
