@@ -40,7 +40,7 @@ const MyProfile = () => {
           </div>
           <div className="flex justify-between items-center mb-2">
             <span className="font-semibold">Phone:</span>
-            <span>{user.phone}</span>
+            <span>{user.phoneNumber}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
             <span className="font-semibold">Location:</span>

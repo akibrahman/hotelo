@@ -6,7 +6,7 @@ import useSecureAxios from "./useSecureAxios";
 const useUser = () => {
   const { user } = useContext(AuthContext);
   const axiosInstance = useSecureAxios();
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ["user", user?.email],
     queryFn: async ({ queryKey }) => {
       const user = await axiosInstance.get(`/user/${queryKey[1]}`);
@@ -14,7 +14,7 @@ const useUser = () => {
     },
     enabled: user.email ? true : false,
   });
-  return data;
+  return { ...data, refetch };
 };
 
 export default useUser;

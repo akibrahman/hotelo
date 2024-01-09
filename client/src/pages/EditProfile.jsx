@@ -1,14 +1,22 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { base64 } from "../API/base64";
+import { makeFile } from "../API/makeFile";
+import secureAxios from "../API/secureAxios";
+import { imageUpload } from "../API/util";
 import useUser from "../hooks/useUser";
 
 const EditProfile = () => {
   const user = useUser();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: user.name,
     age: user.age,
     photo: user.photo,
-    phoneNumber: user.phone,
+    phoneNumber: user.phoneNumber,
     address: user.address,
     bio: user.bio,
   });
@@ -21,9 +29,27 @@ const EditProfile = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setLoading(true);
+    const url = await imageUpload(
+      formData.photo == user.photo
+        ? null
+        : await makeFile(formData.photo, user.name, "image"),
+      user.photo
+    );
+    const { data } = await secureAxios.post(`/edit-profile/${user._id}`, {
+      ...formData,
+      photo: url,
+    });
+    if (data.message == "Internal Server Error") {
+      toast.error(data.message);
+    } else {
+      toast.success("Profile Updated");
+      navigate("/dashboard/my-profile");
+    }
+    await user.refetch();
+    setLoading(false);
   };
 
   const validatePhoneNumber = (phoneNumber) => {
@@ -77,7 +103,7 @@ const EditProfile = () => {
                 name="lastName"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-md"
+                className="mt-1 p-2 w-full border rounded-md outline-none"
                 required
               />
             </div>
@@ -94,7 +120,7 @@ const EditProfile = () => {
                 name="age"
                 value={formData.age}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-md"
+                className="mt-1 p-2 w-full border rounded-md outline-none"
                 required
               />
             </div>
@@ -111,7 +137,7 @@ const EditProfile = () => {
                 type="email"
                 readOnly
                 value={user.email}
-                className="mt-1 p-2 w-full border rounded-md"
+                className="mt-1 p-2 w-full border rounded-md outline-none"
               />
             </div>
             <div className="mb-4 flex-1">
@@ -127,7 +153,7 @@ const EditProfile = () => {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                className={`mt-1 p-2 w-full border rounded-md ${
+                className={`mt-1 p-2 w-full border rounded-md outline-none ${
                   validatePhoneNumber(formData.phoneNumber)
                     ? "border-green-500"
                     : "border-red-500"
@@ -153,7 +179,7 @@ const EditProfile = () => {
               name="bio"
               value={formData.bio}
               onChange={handleInputChange}
-              className="mt-1 p-2 w-full border rounded-md"
+              className="mt-1 p-2 w-full border rounded-md outline-none"
               rows="4"
               required
             />
@@ -170,16 +196,17 @@ const EditProfile = () => {
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              className="mt-1 p-2 w-full border rounded-md"
+              className="mt-1 p-2 w-full border rounded-md outline-none"
               rows="4"
               required
             />
           </div>
           <button
             type="submit"
-            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center gap-3"
           >
             Submit
+            {loading && <FaSpinner className="animate-spin" />}
           </button>
         </form>
       </div>

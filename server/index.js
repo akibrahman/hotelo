@@ -167,6 +167,30 @@ async function run() {
       );
       res.send({ msg: "Done" });
     });
+    //! Edit Profile - User
+    app.post("/edit-profile/:id", verifyToken, async (req, res) => {
+      console.log(req.params.id);
+      console.log(await req.body);
+      try {
+        const data = await req.body;
+        const result = await usersCollection.updateOne(
+          { _id: new ObjectId(req.params.id) },
+          {
+            $set: {
+              name: data.name,
+              age: data.age,
+              photo: data.photo,
+              phoneNumber: data.phoneNumber,
+              address: data.address,
+              bio: data.bio,
+            },
+          }
+        );
+        res.send(result);
+      } catch (error) {
+        res.send({ message: "Internal Server Error" });
+      }
+    });
     //! Get All User
     app.get("/all-users", verifyToken, async (req, res) => {
       const users = await usersCollection.find().toArray();
