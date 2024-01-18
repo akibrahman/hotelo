@@ -3,6 +3,15 @@ import Container from "../Container";
 import MenuDropdown from "./MenuDropdown";
 
 const Navbar = () => {
+  // const link =
+  //   "https://drive.google.com/uc?export=download&id=1_PomyXfyWstNM7B7vlmTsWXG0CPLW5bi";
+  // const handleDownload = () => {
+  //   const tempEl = document.createElement("a");
+  //   document.body.appendChild(tempEl);
+  //   tempEl.href = link;
+  //   tempEl.click();
+  //   document.body.removeChild(tempEl);
+  // };
   return (
     <div className="fixed w-full bg-white z-10 shadow-sm">
       <div className="py-4 border-b-[1px]">

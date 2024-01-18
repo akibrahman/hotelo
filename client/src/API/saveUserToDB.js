@@ -7,6 +7,7 @@ export const saveUser = async (user) => {
     role: "guest",
     status: "Verified",
     photo: user.photoURL,
+    likings: [],
   };
   const { data } = await publicAxios.put(`/users/${user?.email}`, userData);
   return data;
